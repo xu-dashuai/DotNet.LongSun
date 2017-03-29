@@ -1,0 +1,18 @@
+﻿@{
+    var customer = new Lunson.Web.CustomerCache();
+
+}
+
+<div class="user">
+    @if (customer.IsLogin == false)
+    {
+        <a href="@Url.Action("Login","Account")">[登录]</a>
+        <a href="@Url.Action("Register", "Account")">[注册]</a>
+    }
+    else
+    {
+        <span>您好，</span>
+        <a href="@Url.Action("Index", "BookLet")">@HttpUtility.UrlDecode(customer.DisplayName)</a>
+        <a href="@Url.Action("Logout", "Account")">[退出]</a>
+    }
+</div>

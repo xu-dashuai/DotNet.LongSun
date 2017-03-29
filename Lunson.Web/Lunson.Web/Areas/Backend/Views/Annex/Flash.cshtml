@@ -1,0 +1,94 @@
+﻿
+<table id="annex"></table>
+
+<div id="toolbar">
+    <a class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="create()">添加 Flash 文件</a>
+</div>
+
+<script type="text/javascript">
+    $annex = $("#annex");
+    $(function () {
+        $annex.datagrid({
+            url: '@Url.Action("GetFlashs")',
+            fit: true,
+            border: false,
+            singleSelect: true,
+            toolbar: '#toolbar',
+            rownumbers: true,
+            columns: [[
+                { field: 'OldName', title: '名称', width: 200 },
+                { field: 'Url', title: '地址', width: 400 },
+                { field: 'Size', title: '大小(KB)', width: 60, formatter: function (value, row, index) { return (Number(value) / 1024).toFixed(2); } },
+                {
+                    field: 'Editor', title: '编辑', width: 100, formatter: function (value, row, index) {
+                        var html = "<a href='javascript:;' onclick=\"editflash('" + row.ID + "')\">修改</a> | <a href='javascript:;' onclick=\"removeflash('" + row.ID + "')\">删除</a> | <a href='javascript:;' onclick=\"showflash('" + row.ID + "')\">播放</a>";
+                        return html;
+                    }
+                }
+            ]]
+        });
+    })
+
+    function create() {
+        pharos.easyui.dialog.topOpen("createFlash", {
+            width: 350,
+            height: 180,
+            resizable: false,
+            modal: true,
+            title: '添加Flash文件',
+            href: '@Url.Action("UploadFlash")'
+        });
+    }
+
+    function editflash(id) {
+        pharos.easyui.dialog.topOpen("editFlash", {
+            width: 500,
+            height: 230,
+            resizable: false,
+            modal: true,
+            title: '修改Flash',
+            href: '@Url.Action("EditFlash")/' + id,
+            buttons: [{
+                text: '保存', iconCls: 'icon-save', handler: function () {
+                    window.top.$('#editFlash form').submit();
+                }
+            }]
+        });
+    }
+
+    function removeflash(id) {
+        pharos.easyui.confirm("确认", "确认删除么？", function () {
+            $.post("@Url.Action("RemoveFlash")/" + id, function () {
+                $("#annex").datagrid("reload");
+            })
+        });
+    }
+
+    function showflash(id) {
+        pharos.easyui.dialog.topOpen("showFlash", {
+            width: 700,
+            height: 450,
+            resizable: false,
+            modal: true,
+            title: '播放Flash',
+            href: '@Url.Action("ShowFlash")/' + id
+        });
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

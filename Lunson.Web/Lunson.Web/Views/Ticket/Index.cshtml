@@ -1,0 +1,136 @@
+﻿@model List<Lunson.Domain.Entities.Ticket>
+@{
+    ViewBag.Title = "南顺鳄鱼园 网上购票";
+    ViewBag.nav = "buyticket";
+    ViewBag.label = "";
+}
+
+<div class="w1000 ticketlist clearfix">
+    <div class="wrap">
+        <p class="msgtip">温馨提示：购买单种票类可点击绿色立即购买按钮，购买多种票类可点击橙色组合购买按钮，可在点击购买后确认票数。</p>
+
+        @foreach (var x in Model)
+        {
+            <div class="ticket">
+                <img src="@(x.Annex==null?"":x.Annex.Url)_thumb.jpg" class="pic" />
+                <div class="detail">
+                    <p class="name"><a href="@Url.Action("TicketParticular")?id=@x.ID" target="_blank">@x.Name</a></p>
+                    <p class="description">@x.Resume</p>
+                    <p class="address">@(x.Address.IsNullOrTrimEmpty()?"":("地址："+x.Address))</p>
+                </div>
+                <i></i>
+                <div class="order clearfix">
+                    <p class="price"><span>￥</span>@x.CurPrice</p>
+                    @if (x.PrePrice != null && x.PrePrice != 0)
+                    {
+                        <p class="preprice">
+                            <span>原价￥</span>@x.PrePrice
+                        </p>
+                    }
+                    @Html.Partial("_PartialNumBox", x.ID)
+                    <a class="btn-buy" onclick="singleBuy(this)">立即购买</a>
+                    <br />&nbsp;
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="groupbuy">
+        <a href="javascript:;" class="btn-groupbuy" onclick="groupBuy(); return false;">组合购买</a>
+    </div>
+
+
+</div>
+
+<script language="javascript">
+
+    $(function () {
+        //加载时隐藏数量框
+        $(".numbox,.btn-buy").addClass("notshow");
+        //循环判断框是否隐藏
+        $(".ticket").mouseover(function () {
+            $(this).find(".notshow").removeClass("notshow");
+        });
+        $(".ticket").mouseout(function () {
+            var num = $(this).find("input[name='num']").val();
+            if (num ==0) {
+                $(this).find(".numbox,.btn-buy").addClass("notshow");
+            }
+        });
+    
+
+    })
+
+    function singleBuy(e) {
+        var num = $(e).parent().find("input[name='num']").val();
+        var Id = $(e).parent().find("input[name='num']").attr("data-target");
+        if (Id != ""&&Id!=undefined) {
+            var json = { ID: Id, Num: num==0?1:num };
+            pharos.json.submit(json, "post", "/Ticket/TicketDetails");
+        }
+    }
+
+    //组合购买
+    function groupBuy() {
+        var Id = "";
+        var num = "";
+        $(".ticket").each(function (i, item) {
+            var value = $(item).find("input[name='num']").val();
+            if (value != 0 && value != undefined) {
+                var tid = $(item).find("input[name='num']").attr("data-target");
+                if (num == "") {
+                    num = value;
+                    Id = tid;
+                }
+                else {
+                    num += ("," + value);
+                    Id += ("," + tid);
+                }
+            }
+        })
+        if (Id != "" && num != "") {
+            var json = { ID: Id, Num: num };
+            pharos.json.submit(json, "post", "/Ticket/TicketDetails");
+        }
+        else {
+            alert("请选择您要购买的门票！");
+        }
+    }
+
+</script>
+<script type="text/javascript">
+    $("input[name=num]").keyup(function () {
+        var value = $(this).val();
+        try {
+            value = value.replace(/\D/g, '');
+            $(this).val(Number(value));
+        }
+        catch (e) {
+            $(this).val(1);
+        }
+    });
+    $(".decrease").click(function () {
+        var value = $(this).parent().find("input[name='num']").val();
+        try {
+            value = value.replace(/\D/g, '');
+            value = Number(value) - 1;
+        }
+        catch (e) {
+            value = 1;
+        }
+        if (value <0)
+            value=0;
+        $(this).parent().find("input[name='num']").val(value);
+    });
+    $(".increase").click(function () {
+        var value = $(this).parent().find("input[name='num']").val();
+        try {
+            value = value.replace(/\D/g, '');
+            value = Number(value) + 1;
+        }
+        catch (e) {
+            value = 1;
+        }
+        $(this).parent().find("input[name='num']").val(value);
+    });
+</script>

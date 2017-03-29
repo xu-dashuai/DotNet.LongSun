@@ -1,0 +1,81 @@
+﻿@{
+    ViewBag.Title = "退票确认";
+}
+
+<div id="toolbar">
+    <a class="easyui-linkbutton" data-options="iconCls: 'icon-ok'" id="comfirm">确认退款</a>
+    票号查询 <input class="easyui-textbox" id="condition" />
+    <a class="easyui-linkbutton" data-options="iconCls: 'icon-search'" id="search">查询</a>
+</div>
+<table id="dg"></table>
+
+<script type="text/javascript">
+
+    $(function () {
+        $("#dg").datagrid({
+            url: '@Url.Action("GetRefundingData")?condition=',
+            fit: true,
+            fitColumns: true,
+            rownumbers: true,
+            border: false,
+            remoteSort: false,
+            pagination: true,
+            pageSize: 20,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'TicketNO', title: '票号', width: 250, halign: 'center', formatter: function (value, row, index) { return row.a.TicketNO } },
+                { field: 'OrderNo', title: '订单号', width: 250, align: 'center', formatter: function (value, row, index) { return row.OrderDetail.OrderNo } },
+                {
+                    field: 'Customer', title: '客户', width: 250, align: 'center', formatter: function (value, row, index) {
+                        return row.Customer.Mobile = null ? "" : row.Customer.Mobile;
+                    }
+                },
+                { field: 'Name', title: '门票名称', sortable: true, width: 250, align: 'center', formatter: function (value, row, index) { return row.a.Name } },
+                { field: 'CurPrice', title: '购买价', width: 100, align: 'center', formatter: function (value, row, index) { return row.a.CurPrice } },
+                { field: 'Status', title: '状态', width: 100, align: 'center', formatter: function (value, row, index) { return "申请退款"; } },
+                { field: 'RefundingTime', title: '申请时间', sortable: true, width: 200, align: 'center', formatter: function (value, row, index) { return row.time } },
+            ]]
+        })
+    })
+
+    $("#comfirm").click(function () {
+        var rows = $("#dg").datagrid('getSelections');
+        var ids = [];
+        var totalPrice = 0;
+        if (rows.length == 0) {
+            alert("请勾选要确认的项目！");
+            return false;
+        }
+        else {
+            $.each(rows, function (index, row) {
+                ids.push(row.a.ID);
+                totalPrice += row.a.CurPrice;
+            });
+
+            window.top.$("body").data("num", rows.length);
+            window.top.$("body").data("totalPrice", totalPrice);
+            window.top.$("body").data("ids", ids);
+
+            pharos.easyui.dialog.topOpen("comfirmDlg", {
+                width: 500,
+                height: 340,
+                resizable: false,
+                modal: true,
+                title: '确认退款',
+                href: '@Url.Action("TicketRefundForm")',
+                buttons: [{
+                    text: '确定',
+                    iconCls: 'icon-ok',
+                    handler: function () { window.top.$("body").data("TicketRefundForm")(".default-form form").submit(); }
+                }]
+            });
+
+        }
+
+    })
+    $("#search").click(function () {
+        $("#dg").datagrid({
+            url: '@Url.Action("GetRefundingData")' + '?condition=' + $("#condition").val()
+        })
+    })
+</script>

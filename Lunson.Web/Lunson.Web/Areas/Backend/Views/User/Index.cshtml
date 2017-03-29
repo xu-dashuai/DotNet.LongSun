@@ -1,0 +1,117 @@
+﻿@{
+    ViewBag.Title = "用户管理";
+}
+
+<table id="user"></table>
+
+<div id="toolbar">
+    <a class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="createUser()">添加用户</a>
+</div>
+<script type="text/javascript">
+    $user = $("#user");
+    var statustate = [];
+    @foreach (var x in EnumHelper.GetList<ActiveState>())
+    {
+        @:statustate.push({ value: '@x.Value', text: '@x.Text' });
+    }
+
+    
+
+    $(function () {
+        $user.datagrid({
+            url: '@Url.Action("GetUsers")',
+            title: '<span style="color:#ff6a00;">系统超级管理字体为粗体且无法删除</span>',
+            fit: true,
+            border: false,
+            toolbar: '#toolbar',
+            rownumbers: true,
+            singleSelect: true,
+            columns: [[
+                { title: '用户名', field: 'UserName', width: 100 },
+                { title: '显示名', field: 'DisplayName', width: 100 },
+                { title: '权限', field: 'Role', width: 200 },
+                { title: '状态', field: 'Status', width: 50, formatter: function (value, row, index) { return pharos.json.getArrayValue(statustate, 'value', value, 'text', value); } },
+                { title: '最后登录IP', field: 'IP', width: 100 },
+                { title: '最后登录时间', field: 'LastLoginTime', width: 150 },
+                { title: '登录次数', field: 'LoginTimes', width: 60 },
+                {
+                    title: '操作', field: 'Editor', width: 150, formatter: function (value, row, index) {
+                        var html = "<a href='javascript:;' onclick='editUser(\""+row.ID+"\")'>编辑</a>&nbsp;";
+                        html += " <i>|</i> &nbsp;";
+                        html += "<a href='javascript:;' onclick='removeUser(\"" + row.ID + "\")'>删除</a>&nbsp;";
+                        html += " <i>|</i> &nbsp;";
+                        html += "<a href='javascript:;' onclick='editPassword(\"" + row.ID + "\")'>修改密码</a>";
+                        return html;
+                    }
+                }
+            ]],
+            rowStyler: function (index, row) {
+                if (row.IsAdmin == '1') {
+                    return 'font-weight:bold;';
+                }
+            }
+        });
+    })
+
+
+    function createUser() {
+        pharos.easyui.dialog.topOpen("createUser", {
+            width: 700,
+            height: 500,
+            resizable: false,
+            cache:false,
+            modal: true,
+            title: '添加用户',
+            href: '@Url.Action("CreateUser")',
+            buttons: [{
+                text: '保存', iconCls: 'icon-save', handler: function () {
+                    window.top.$('#createUser form').submit();
+                }
+            }]
+        });
+    }
+
+    function editUser(id) {
+        pharos.easyui.dialog.topOpen("editUser", {
+            width: 700,
+            height: 400,
+            resizable: false,
+            modal: true,
+            title: '修改用户',
+            href: '@Url.Action("EditUser")/'+id,
+            buttons: [{
+                text: '保存', iconCls: 'icon-save', handler: function () {
+                    window.top.$('#editUser form').submit();
+                }
+            }]
+        });
+    }
+
+    function editPassword(id) {
+        pharos.easyui.dialog.topOpen("editUserPassword", {
+            width: 500,
+            height: 280,
+            resizable: false,
+            modal: true,
+            title: '修改用户密码',
+            href: '@Url.Action("EditUserPassword")/' + id,
+            buttons: [{
+                text: '保存', iconCls: 'icon-save', handler: function () {
+                    window.top.$('#editUserPassword form').submit();
+                }
+            }]
+        });
+    }
+
+    function removeUser(id) {
+        pharos.easyui.confirm("确认", "确认删除么？", function () {
+            $.post("@Url.Action("RemoveUser")/" + id, function (data, status) {
+                if (data.validate == false) {
+                    alert(data.msg);
+                    return;
+                }
+                $("#user").datagrid("reload");
+            })
+        });
+    }
+</script>

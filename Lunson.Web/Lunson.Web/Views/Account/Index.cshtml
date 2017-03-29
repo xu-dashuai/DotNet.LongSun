@@ -1,0 +1,177 @@
+﻿@model Lunson.Web.Models.AccountVM
+@{
+    ViewBag.Title = "我的账户";
+    ViewBag.nav = "myaccount";
+}
+
+<div class="w1000 accountlist">
+
+    <ul class="clearfix nav">
+        @*<li class="">购票历史<i></i></li>*@
+        <li class="">修改密码<i></i></li>
+        @*<li class="">帐号信息<i></i></li>*@
+    </ul>
+
+    <div class="content">
+        @using (Html.BeginForm("ModifyPwd", "Account", FormMethod.Post, new { id = "pwdForm", onsubmit = "return syncSubmit();" }))
+        {
+            <div class="loginwrap">
+                <p class="msg">
+                    <label>原密码</label><input type="password" id="CurPwd" name="CurPwd" />
+                    <span id="CurPwdMsg"></span>
+                </p>
+                <p class="msg">
+                    <label>新密码</label><input type="password" id="NewPwd" name="NewPwd" />
+                    <span id="NewPwdMsg"></span>
+                </p>
+                <p class="msg">
+                    <label>确认密码</label><input type="password" id="ConfirmPwd" name="ConfirmPwd" />
+                    <span id="ConfirmPwdMsg"></span>
+                </p>
+                <p>
+                    <a class="btn-login" onclick="$('#pwdForm').submit()">确认修改</a>
+                </p>
+            </div>
+        }
+    </div>
+
+    <div class="content">
+        @using (Html.BeginForm("Index", "Account", FormMethod.Post, new { id = "accountForm" }))
+        {
+            <div class="loginwrap">
+                <p style="text-align:left;color:red;">
+                    @if (Model.IsMobileCheck == Lunson.Domain.YesOrNo.No)
+                    {
+                        @:你的手机号未验证，找回密码时将无法通过手机号找回
+                    }
+                </p>
+                <p class="msg">
+                    <label>显示名</label><input type="text" id="DisplayName" name="DisplayName" value="@Model.DisplayName" />
+                    @Html.ValidationMessageFor(model => model.DisplayName)
+                </p>
+                <p class="msg check" style="">
+                    <label>手机</label><input type="text" id="Mobile" name="Mobile" value="@Model.Mobile" />
+                    <label style="left: 250px; position: absolute; width: 100px; _left: 240px;">验证码</label><input type="text" name="MobileCode" style="width: 100px; position: absolute; top: 0; left: 270px; _width: 180px; _height: 30px; *top: 1px; _left: 260px; " />
+                    <a href="javascript:void(0);" class="btn-register" style="position:absolute;top:0;left:450px;height:30px;line-height:30px;font-size:1em;width:100px;" id="getCode" onclick="getcode(this)">获取手机验证码</a>
+                    @*<input class="btn-register" style="position:absolute;top:0;left:450px;height:30px;line-height:30px;font-size:1em;width:100px;" id="getCode" onclick="getcode()" value="获取手机验证码" />*@
+                    @Html.ValidationMessageFor(model => model.Mobile)
+                </p>
+                @*<p class="msg check">
+                        <label>邮箱</label><input type="text" id="Email" name="Email" value="@Model.Email" />
+                        <label style="left:250px;position:absolute;width:100px;_left:240px;">验证码</label><input type="text" style="width:100px;position:absolute;top:0;left:270px;_width:180px;_height:30px;*top:1px;_left:260px;" />
+                        <a class="btn-register" style="position:absolute;top:0;left:450px;height:30px;line-height:30px;font-size:1em;width:100px;">获取邮箱验证码</a>
+                        @Html.ValidationMessageFor(model => model.Email)
+                    </p>*@
+                <p style="text-align:left;">
+                    <label>性别</label>
+                    <div class="other">
+                        <input type="radio" name="Sex" value="Male" />男
+                        <input type="radio" name="Sex" value="Female" />女
+                        <input type="radio" name="Sex" value="Secret" />保密
+                    </div>
+                </p>
+                <p>
+                    <a class="btn-login" onclick="$('#accountForm').submit()">保存</a>
+                </p>
+            </div>
+        }
+    </div>
+
+</div>
+
+<script src="~/Scripts/jquery/jquery.form.js"></script>
+<script>
+    $(function () {
+
+        $("input[name='Sex'][value=@Model.Sex]").attr("checked", "checked");
+
+        $(".accountlist .nav li").click(function () {
+            if ($(this).hasClass("active")) {
+                return;
+            }
+
+            $(".accountlist .nav li").removeClass("active").removeClass("linel");
+            $(this).addClass("active");
+            var next = $(this).next();
+            if (next.length == 1) {
+                next.addClass("linel");
+            }
+            var index = $(".accountlist .nav li").index($(this));
+
+            $(".accountlist .content").removeClass("active");
+            $(".accountlist .content").eq(index).addClass("active");
+            $.cookie("account_tab", index);
+        });
+
+
+        var tabIndex = $.cookie("account_tab");
+        if (tabIndex == null)
+            $(".accountlist>.nav li").eq(0).click();
+        else
+            $(".accountlist>.nav li").eq(tabIndex).click();
+    })
+
+    function syncSubmit() {
+        $("#pwdForm span").text("");
+
+        $("#pwdForm").ajaxSubmit({
+            type: "post",
+            url: "@Url.Action("ModifyPwd")",
+            data: $('#pwdForm').serialize(),
+            success: function (o) {
+                if (o.target == "" || o.target == null) {
+                    alert(o.message);
+                }
+                else {
+                    $("#" + o.target).text(o.message);
+                }
+            }
+        })
+        return false;
+    }
+
+    function getcode(e) {
+        if ($(e).hasClass("disabled"))
+            return;
+
+        var mobile = $('#Mobile').val();
+        var code = $('#MobileCode').val();
+
+        $.post('@Url.Action("GetMobileCode")', { mobile: mobile, code: code }, function (data, status) {
+            if (data.success == true) {
+                window.location.reload();
+            }
+            else {
+                alert(data.msg);
+            }
+        });
+    }
+
+</script>
+
+@{
+    var countDown = (int)(ViewBag.CountDown ?? 0) ;
+    if (countDown > 0 && countDown < 120)
+    {
+        <script>
+            $("#getCode").addClass("disabled");
+            var ss = @countDown;
+            var i = 1;
+            var time = 0;
+
+            var x = self.setInterval(cd, 1000);
+            function cd() {
+                time = ss - i;
+                if (time <= 0) {
+                    clearInterval(x);
+                    $("#getCode").removeClass("disabled").text("获取手机验证码");
+                }
+                else{
+                    $("#getCode").text("（"+time + "）秒");
+                }
+
+                i++;
+            }
+        </script>
+    }
+}

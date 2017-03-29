@@ -1,0 +1,93 @@
+﻿@{
+    ViewBag.Title = "未使用的门票";
+}
+
+<style>
+    div.datagrid-footer tr { background-color: #6293BB; color: #fff; font-weight: bold; }
+</style>
+
+<div id="toolbar">
+    <select id="queryBy" class="easyui-combobox" data-options="panelHeight: 'auto', editable: false" style="width:80px;">
+        <option value="ticketNo" selected>票号</option>
+        <option value="mobile">手机号</option>
+    </select>
+    -><input id="queryString" class="easyui-textbox" style="width: auto;" />
+    <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" id="search">查询</a>
+</div>
+
+<table id="dg"></table>
+
+<script>
+    $(function () {
+        $("#dg").datagrid({
+            url: '@Url.Action("UnusedTicketsData")',
+            toolbar: '#toolbar',
+            fit: true,
+            border: false,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            showFooter: true,
+            columns: [[
+                { title: 'ID', field: 'ID', hidden: true },
+                { title: '票号', field: 'TicketNO', width: 100, halign: 'center' },
+                { title: '商户订单号', field: 'OrderNo', width: 100, halign: 'center' },
+                { title: '门票名称', field: 'Name', width: 100, align: 'center' },
+                { title: '购买时间', field: 'BuyTime', width: 80, align: 'center' },
+                { title: '售价/元', field: 'CurPrice', width: 60, align: 'center' },
+                { title: '客户手机号', field: 'Mobile', width: 80, align: 'center' },
+                { title: '操作', field: 'Editor', width: 80, align: 'center', formatter: opFormat }
+            ]]
+        })
+
+        $("#search").click(function () {
+            var queryBy = $("#queryBy").combobox("getValue");
+            var queryString = $("#queryString").val();
+
+            $("#dg").datagrid({
+                url: '@Url.Action("SearchUnusedTicket")',
+                queryParams: { queryBy: queryBy, queryString: queryString }
+            })
+        })
+
+        setInterval(dgreload,10000);
+    })
+
+    function dgreload() {
+        $("#dg").datagrid("reload");
+    }
+
+    function opFormat(value, row) {
+        if (value == null) {
+            var html = "";
+            html += "<a href=\"javascript:void(0)\" onclick=\"refundTicket('" + row.ID + "','" + row.CurPrice + "')\">退票</a>";
+            return html;
+        }
+        else {
+            return null;
+        }
+    }
+
+    function refundTicket(ticketID, price) {
+        var ids = [];
+        ids.push(ticketID)
+
+        window.top.$("body").data("num", 1);
+        window.top.$("body").data("totalPrice", price);
+        window.top.$("body").data("ids", ids);
+
+        pharos.easyui.dialog.topOpen("comfirmDlg", {
+            width: 500,
+            height: 340,
+            resizable: false,
+            modal: true,
+            title: '确认退款',
+            href: '@Url.Action("TicketRefundForm")',
+            buttons: [{
+                text: '确定',
+                iconCls: 'icon-ok',
+                handler: function () { window.top.$("body").data("TicketRefundForm")(".default-form form").submit(); }
+            }]
+        })
+    }
+</script>

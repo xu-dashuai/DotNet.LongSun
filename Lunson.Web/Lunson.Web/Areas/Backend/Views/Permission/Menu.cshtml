@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Title = "权限管理";
+}
+
+<div id="menuly" data-options="fit:true,border:false">
+    <div data-options="region:'west',split:true" style="width: 200px;">
+        <ul id="sys" class="easyui-tree" data-options="url:'@Url.Action("GetMenus","Menu")',onClick:function(node){selectmenu(node)}"></ul>
+    </div>
+    <div data-options="region:'center'">
+        <iframe scrolling="auto" id="permissiondetail" frameborder="0" src="" style="width:100%;height:99%;"></iframe>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $("#menuly").layout({ collapsible: false });
+        $('#list').accordion({
+            animate: true,
+            fit: true,
+            border: false,
+            selected: 0
+        });
+    })
+
+    function selectmenu(node) {
+        if (node.attributes.url)
+            $("#permissiondetail").attr("src", '@Url.Action("GetMenu")?id=' + node.id);
+    }
+</script>

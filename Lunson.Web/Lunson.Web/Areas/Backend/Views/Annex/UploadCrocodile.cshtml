@@ -1,0 +1,24 @@
+﻿<div class="default-form">
+    <h1>点击上传图片</h1>
+    <div class="content">
+        <input type="file" name="crocodile" id="crocodile" onchange="uploadcrocodile()" />
+    </div>
+</div>
+
+<script type="text/javascript">
+    function uploadcrocodile() {
+        pharos.upload.ajaxfileupload.upload('crocodile', '@Url.Action("UploadCrocodile")', '@Url.Action("GetCrocodileMsg")',
+            function (data) {
+                if (data.validate) {
+                    pharos.easyui.alert('提示', '保存成功');
+                    pharos.easyui.dialog.topClose("createCrocodile");
+                    pharos.easyui.dialog.curJquery("createCrocodile")("#annex").datagrid("reload");
+                }
+                else {
+                    pharos.easyui.alert('错误', data.msg);
+                }
+            }, function (e) {
+                pharos.easyui.alert(e.status, e.statusText);
+            })
+    }
+</script>

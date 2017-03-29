@@ -1,0 +1,180 @@
+﻿@{
+    ViewBag.Title = "菜单管理";
+}
+
+<table id="menu"></table>
+
+<div id="toolbar">
+    <a class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="create();">添加</a>
+    <a class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="removeMenu()">删除</a>
+    <a class="easyui-linkbutton" data-options="iconCls:'icon-tip'" onclick="upMenu();">菜单置顶</a>
+    <a class="easyui-linkbutton" data-options="iconCls:'icon-save'" onclick="save();">保存</a>
+</div>
+<script src="~/Scripts/pharos.js"></script>
+<script type="text/javascript">
+    $menu = $("#menu");
+    var menuEditting = null;
+    var menuType = [];
+    @foreach (var x in EnumHelper.GetList<MenuType>())
+    { 
+        @:menuType.push({value:'@x.Value',text:'@x.Text'});
+    }
+
+    $(function () {
+        $menu.treegrid({
+            title: '<span style="color:#ff6a00;">双击修改</span>',
+            url: '/backend/menu/getmenus',
+            fit: true,
+            border:false,
+            rownumbers: true,
+            toolbar: "#toolbar",
+            singleSelect: true,
+            idField: 'ID',
+            treeField: 'Name',
+            columns: [[
+                { title: '菜单名称', field: 'Name', width: 200, editor: { type: 'validatebox', options: { required: true } } },
+                { title: '链接地址', field: 'Address', width: 300, editor: { type: 'validatebox' } },
+                { title: '无参数地址', field: 'BriefUrl', width: 200, editor: { type: 'validatebox' } },
+                { title: '排序', field: 'ShowOrder', width: 100, editor: { type: 'numberbox', options: { min: 0, required: true} } },
+                { title: '类型', field: 'Type', width: 100, editor: { type: 'combobox', options: { valueField: 'value', textField: 'text', data: menuType, panelHeight: 'auto', editable: false, required: true } }, formatter: function (value, row, index) { return pharos.json.getArrayValue(menuType,'value',value,'text',value); } },
+                { title: '上层菜单', field: 'ParentID', width: 200, editor: { type: 'combotree', options: { panelHeight: 'auto', editable: false, url: '/backend/menu/getmenus' } }, formatter: function (value, row, index) { return ""; } }
+            ]],
+            onDblClickRow: function (rowData) {
+                if (menuEditting == null) {
+                    menuEditting = rowData.ID;
+                    $menu.treegrid('beginEdit',menuEditting);
+                }
+            },
+            onClickRow: function (rowData) {
+                if (menuEditting != null) {
+                    $menu.treegrid('endEdit', menuEditting);
+                }
+            },
+            onAfterEdit: function (rowData, changes) {
+                if (rowData.ID == '0')
+                    pharos.json.edit(rowData, 'ID', '');
+                $.ajax({
+                    url: '/backend/menu/savemenu',
+                    data: rowData,
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data, status) {
+                        if (data.validate) {
+                            alert("保存成功");
+                            $menu.treegrid("reload");
+                            menuEditting = null;
+                        }
+                        else {
+                            alert(data.msg);
+                            $menu.treegrid('select', menuEditting);
+                            $menu.treegrid('beginEdit', menuEditting);
+                        }
+                    },
+                    error: function (e) {
+                        pharos.easyui.alert(e.status, e.statusText);
+                        $menu.treegrid('select', menuEditting);
+                        $menu.treegrid('beginEdit', menuEditting);
+                    }
+                });
+            }
+        });
+    })
+
+    function create() {
+        if (menuEditting == null) {
+            var newMenu = { Name: '', ID: '0',ParentID:'',ShowOrder:0 };
+            var selected = $menu.treegrid("getSelected");
+            if (selected) {
+                pharos.json.edit(newMenu, 'ParentID', selected.ID);
+                $menu.treegrid('append', {
+                    parent: selected.ID,
+                    data: [newMenu]
+                }).treegrid("beginEdit", 0);
+            }
+            else {
+                var all = $menu.treegrid('getData');
+                if (all.length > 0) {                    
+                    $menu.treegrid('insert', {
+                        before: all[0].ID,
+                        data: newMenu
+                    }).treegrid("beginEdit", 0);
+                }
+                else {
+                    $menu.treegrid('append', {
+                        parent: null,
+                        data: [newMenu]
+                    }).treegrid("beginEdit", 0);
+                }
+            }
+            menuEditting = 0;
+        }
+    }
+
+    function removeMenu() {
+        if (menuEditting != null) {
+            alert("请选取消编辑，再进行删除动作");
+            return;
+        }
+        
+        var row = $menu.treegrid("getSelected");
+        if (row) {
+            $.messager.confirm('提示', '确定删除吗', function (r) {
+                if (r) {
+                    $.ajax({
+                        url: '/backend/menu/removemenu/'+row.ID,
+                        dataType: 'json',
+                        type: 'post',
+                        async: false,
+                        success: function (data, status) {
+                            if (data.validate == false) {
+                                alert(data.msg);
+                                return;
+                            }
+                            $menu.treegrid('reload');
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            $.messager.alert('提示', '请先选中要删除的行');
+        }
+    }
+
+    function upMenu() {
+        if (menuEditting != null) {
+            alert("请选取消编辑，再进行置顶动作");
+            return;
+        }
+
+        var row = $menu.treegrid("getSelected");
+        if (row) {
+            $.messager.confirm('提示', '确定置顶吗', function (r) {
+                if (r) {
+                    $.ajax({
+                        url: '/backend/menu/upmenu/' + row.ID,
+                        dataType: 'json',
+                        type: 'post',
+                        async: false,
+                        success: function (data, status) {
+                            if (data.validate == false) {
+                                alert(data.msg);
+                                return;
+                            }
+                            $menu.treegrid('reload');
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            $.messager.alert('提示', '请先选中要置顶的行');
+        }
+    }
+
+    function save() {
+        if (menuEditting != null) {
+            $menu.treegrid('endEdit', menuEditting);
+        }
+    }
+</script>

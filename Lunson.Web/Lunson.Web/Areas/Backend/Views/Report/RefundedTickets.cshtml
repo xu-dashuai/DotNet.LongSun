@@ -1,0 +1,58 @@
+﻿@{
+    ViewBag.Title = "退票详情统计";
+}
+<style>
+    div.datagrid-footer tr { background-color: #6293BB; color: #fff; font-weight: bold; }
+</style>
+
+<div id="toolbar">
+    退票日期：<input class="Wdate" type="text" style="border-radius: 5px 5px 5px 5px; border: 1px solid #c3d9e0;" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" id="fromTime" name="fromTime" />
+    到 <input class="Wdate" type="text" style="border-radius: 5px 5px 5px 5px; border: 1px solid #c3d9e0;" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" id="endTime" name="endTime" />
+    <a id="search" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>
+    <a id="export" class="easyui-linkbutton" data-options="iconCls:'icon-save'" href="javascript:void(0);">导出xls</a>
+</div>
+<table id="dg"></table>
+
+<script>
+    var time = new Date();
+    var timeFmt = time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate();
+    $("#fromTime").val(timeFmt);
+    $("#endTime").val(timeFmt);
+
+    var fromTime = $("#fromTime").val() + " 00:00:00";
+    var endTime = $("#endTime").val() + " 23:59:59";
+
+    $("#dg").datagrid({
+        url: '@Url.Action("RefundedTicketsData")' + '?fromTime=' + fromTime + "&endTime=" + endTime,
+        toolbar: '#toolbar',
+        title: '<span style="color:#ff6a00;">此报表统计 所有已被执行的退票详细信息，以每张票为单位</span>',
+        fit: true,
+        border: false,
+        rownumbers: true,
+        singleSelect: true,
+        fitColumns: true,
+        showFooter: true,
+        columns: [[
+            { title: '票号', field: 'TicketNO', width: 100, halign: 'center' },
+            { title: '商户订单号', field: 'OrderNo', width: 80, halign: 'center' },
+            { title: '客户手机号', field: 'Mobile', width: 60, align: 'center' },
+            { title: '门票名称', field: 'Name', width: 80, align: 'center' },
+            { title: '售价/元', field: 'CurPrice', width: 40, align: 'center' },
+            { title: '购买时间', field: 'BuyTime', width: 70, align: 'center' },
+            { title: '退款金额/元', field: 'RefundPrice', width: 40, align: 'center' },
+            { title: '退票时间', field: 'RefundedTime', width: 70, align: 'center' },
+            { title: '操作人', field: 'Operator', width: 60, align: 'center' },
+            { title: '描述说明', field: 'Description', width: 60, align: 'center' }
+        ]]
+    })
+
+    $("#search").click(function () {
+        $("#dg").datagrid({
+            url: "@Url.Action("RefundedTicketsData")" + "?fromTime=" + $("#fromTime").val() + " 00:00:00" + "&endTime=" + $("#endTime").val() + " 23:59:59"
+        })
+    })
+
+    $("#export").click(function () {
+        window.open("@Url.Action("ExportRefundedTicketsData")" + "?fromTime=" + $("#fromTime").val() + " 00:00:00" + "&endTime=" + $("#endTime").val() + " 23:59:59");
+    })
+</script>

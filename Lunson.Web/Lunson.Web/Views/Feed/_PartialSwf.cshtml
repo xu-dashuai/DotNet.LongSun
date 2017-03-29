@@ -1,0 +1,13 @@
+﻿@model Lunson.Domain.Entities.Annex
+
+@if (Model != null && Model.Type == Lunson.Domain.AnnexType.Swf)
+{
+    <div id="flashdiv" style="text-align:center;margin:20px 0;">
+        <object id="flashid" class="panel-swf" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" style="width:606px;height:362px;" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,29,0">
+            <param name="movie" value="@Model.Url">
+            <param name="quality" value="high">
+            <param name="wmode" value="transparent">
+            <embed src="@Model.Url" style="width:606px;height:362px;" class="panel-swf" wmode="transparent" quality="high" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash">
+        </object>
+    </div>
+}

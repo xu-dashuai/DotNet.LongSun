@@ -1,0 +1,70 @@
+﻿@{
+    ViewBag.Title = "卖出交易详细报表";
+}
+<style>
+    div.datagrid-footer tr { background-color: #6293BB; color: #fff; font-weight: bold; }
+</style>
+
+<script>
+    var payTypes = [];
+    @foreach (var x in EnumHelper.GetList<PayType>())
+    {
+        @:payTypes.push({ value: '@x.Value', text: '@x.Text' });
+                            }
+</script>
+<table id="dg"></table>
+<div id="toolbar">
+    售票日期 <input class="Wdate" type="text" style="border-radius: 5px 5px 5px 5px; border: 1px solid #c3d9e0;" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" id="fromTime" name="fromTime" />
+    到 <input class="Wdate" type="text" style="border-radius: 5px 5px 5px 5px; border: 1px solid #c3d9e0;" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" id="endTime" name="endTime" />
+    <a id="search" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>
+    <a id="export" class="easyui-linkbutton" data-options="iconCls:'icon-save'" href="javascript:void(0);">导出xls</a>
+</div>
+<script>
+    var time = new Date();
+    var timeFmt = time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate();
+    $("#fromTime").val(timeFmt);
+    $("#endTime").val(timeFmt);
+
+    var fromTime = $("#fromTime").val() + " 00:00:00";
+    var endTime = $("#endTime").val() + " 23:59:59";
+
+    $("#dg").datagrid({
+        url: '@Url.Action("DetailReportData")' + '?fromTime=' + fromTime + "&endTime=" + endTime,
+        toolbar: '#toolbar',
+        pageSize: 20,
+        title:'<span style="color:#ff6a00;">此报表统计 所有卖出的交易详细信息，不论交易是否完成，以每笔（交易的商品名）为单位</span>',
+        fit: true,
+        border: false,
+        rownumbers: true,
+        singleSelect: true,
+        fitColumns: true,
+        pagination: true,
+        showFooter: true,
+        columns: [[
+            { title: '订单号', field: 'OrderNo', width: 100, align: 'center' },
+            { title: '交易号', field: 'TradeNo', width: 100, align: 'center' },
+            { title: '门票名称', field: 'Name', width: 100, align: 'center' },
+            { title: '客户手机号', field: 'Mobile', width: 100, align: 'center' },
+            { title: '支付时间', field: 'BuyTime', width: 100, align: 'center' },
+            {
+                title: '付款方式', field: 'PayType', width: 60, align: 'center', formatter: function (value) {
+                    return pharos.json.getArrayValue(payTypes, 'value', value, 'text', value);
+                }
+            },
+            { title: '数量', field: 'Num', width: 60, align: 'center' },
+            { title: '售价/元', field: 'CurPrice', width: 60, align: 'center' },
+            { title: '金额', field: 'AllPrice', width: 60, align: 'center' },
+            { title: '备注', field: 'Resume', width: 100, align: 'center' }
+        ]]
+    })
+
+    $("#search").click(function () {
+        $("#dg").datagrid({
+            url: '@Url.Action("DetailReportData")' + "?fromTime=" + $("#fromTime").val() + " 00:00:00" + "&endTime=" + $("#endTime").val() + " 23:59:59"
+        })
+    })
+
+    $("#export").click(function () {
+        window.open("@Url.Action("ExportDetailReportData")" + "?fromTime=" + $("#fromTime").val() + " 00:00:00" + "&endTime=" + $("#endTime").val() + " 23:59:59");
+    })
+</script>

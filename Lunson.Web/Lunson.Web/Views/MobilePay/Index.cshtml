@@ -1,0 +1,140 @@
+﻿@model List<Lunson.Domain.Entities.Ticket>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutMobile_Index.cshtml";
+}
+
+
+
+
+
+
+<div style="height: 5%;">
+    <div style="background-color: #b9cc4c; width: 100%; text-align: center; font-size: 1.25em; line-height: 50px; color: #FFFFFF; font-family: 'Microsoft YaHei'; ">
+
+        <span>南顺鳄鱼园</span>
+        <img src="~/Content/default/images/logo.png" style=" height:26px; width:30px;right:10px;top:13px;position:absolute;" />
+    </div>
+</div>
+
+
+
+
+
+<div class="container">
+    <div class="all">
+        <div style="height:10px;"></div>
+        @foreach (var x in Model)
+        {
+            <div class="ticket">
+                <div class="ticket_1">
+                    <img src="@(x.Annex==null?"":x.Annex.Url)_thumb_for_mobile.jpg" width="90" height="90" class="ticket_img" />
+                    <div style="float:left;margin-left:5px;width:65%;">
+                        <span class="ticket_title">@x.Name</span>
+                        <div class="ticket_price_1">
+                            ￥@x.CurPrice
+                            @if (x.PrePrice != null && x.PrePrice != 0)
+                            {
+                                <span class="ticket_price_2">
+                                    原价￥@x.PrePrice
+                                </span>
+                            }
+                        </div>
+
+                        <span class="ticket_detail">@x.Resume</span>
+                    </div>
+                </div>
+                <div class="ticket_number">
+                    <span class="ticket_number_text">购买数量</span>
+                    <span class="ticket_number_increase glyphicon-plus glyphicon"></span>
+                    <input type="text" name="num" class="ticket_number_input" data-target="@x.ID" value="@(ViewBag.num==null?0:ViewBag.num)" maxlength="3" min="1" />
+                    <span class="ticket_number_decrease glyphicon-minus glyphicon"></span>
+                </div>
+            </div>
+        }
+        <div class="ticket_buy">
+            <label class="tel">手机号码</label>
+            <input class="form-control" name="mobile" /><span class="tel_hint">（手机号将作为您找回门票的凭证）</span>
+        </div>
+
+        <button class="ticket_buy_button" onclick="toBuy(); return false;">购买</button>
+
+        <a name="myTickets" href="@Url.Action("History")"><div class="ticket_record"> 查询门票记录</div></a>
+    </div>
+</div>
+
+<script>
+
+    $("input[name=num]").keyup(function () {
+        var value = $(this).val();
+        try {
+            value = value.replace(/\D/g, '');
+            $(this).val(Number(value));
+        }
+        catch (e) {
+            $(this).val(1);
+        }
+    });
+    $(".ticket_number_decrease").click(function () {
+        var value = $(this).parent().find("input[name='num']").val();
+        try {
+            value = value.replace(/\D/g, '');
+            value = Number(value) - 1;
+        }
+        catch (e) {
+            value = 1;
+        }
+        if (value < 0)
+            value = 0;
+        $(this).parent().find("input[name='num']").val(value);
+    });
+    $(".ticket_number_increase").click(function () {
+        var value = $(this).parent().find("input[name='num']").val();
+        try {
+            value = value.replace(/\D/g, '');
+            value = Number(value) + 1;
+        }
+        catch (e) {
+            value = 1;
+        }
+        $(this).parent().find("input[name='num']").val(value);
+    });
+
+    function toBuy() {
+        var Id = "";
+        var num = "";
+        var mobile = $("input[name='mobile']").val();
+        var reg = /^1[3|5|7|8]\d{9}(dc2014)?$/;
+        var error_tip = $(".ticket_buy .tel_hint");
+
+        if (mobile == undefined || mobile == "") error_tip.text("！ 请输入您的手机号码").css("color", "red");
+        else {
+            if (reg.test(mobile) == false) error_tip.text("！ 手机格式不正确").css("color", "red");
+            else {
+
+                $(".ticket").each(function (i, item) {
+                    var value = $(item).find("input[name='num']").val();
+                    if (value != 0 && value != undefined) {
+                        var tid = $(item).find("input[name='num']").attr("data-target");
+                        if (num == "") {
+                            num = value;
+                            Id = tid;
+                        }
+                        else {
+                            num += ("," + value);
+                            Id += ("," + tid);
+                        }
+                    }
+                })
+                if (Id != "" && num != "") {
+                    var json = { ID: Id, Num: num, mobile: mobile };
+                    pharos.json.submit(json, "post", "@Url.Action("Confirm")");
+                }
+                else {
+                    error_tip.text("！ 请选择您要购买的门票").css("color", "red");
+                }
+            }
+        }
+
+    }
+</script>

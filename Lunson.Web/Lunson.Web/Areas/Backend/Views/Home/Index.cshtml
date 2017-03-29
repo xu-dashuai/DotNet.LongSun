@@ -1,0 +1,129 @@
+﻿<div id="layout">
+    <div data-options="region:'north',border:false" style="height:70px;">
+        <div class="header">
+            你好，@UserCache.CurrentUser.DisplayName <i>|</i> <a href="@Url.Action("LogOut","Account")">[退出]</a>
+        </div>
+    </div>
+    <div data-options="region:'west',border:true" style="width:250px;">
+        <ul id="menu"></ul>
+    </div>
+    <div data-options="region:'center'">
+        <div id="tabs" class="easyui-tabs" data-options="fit:true,border:false">
+
+        </div>
+
+    </div>
+    <div data-options="region:'south',border:false" style="height: 42px; background-color: #ffffff; padding: 5px;">
+        <div class="footer">
+            <img src="@Url.Content("~/Content/default/images/pharoslogo.png")" />
+            版权所有 Copyright © 2014-2020  道诚(厦门)信息科技有限公司  All Rights Reserved 保留所有权利  version 0.0.0.1
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        pharos.window.toTop();
+
+        $layout = $("#layout");
+        $menu = $("#menu");
+
+        $layout.layout({
+            fit: true,
+            border: false
+        });
+
+        //道诚导航
+        $.post('@Url.Action("GetNavMenus","Menu")', function (data, status) {
+            for (var i = 0; i < data.length; i++) {
+                $li = $("<li class='close'></li>");
+                $li.append("<div class='link' onclick=\"jump('" + data[i].Name + "','" + data[i].Address + "','" + data[i].ID + "')\"><div><i class='arrow'></i>" + data[i].Name + "<i class='color c" + (i % 4 + 1) + "'></i></div></div>");
+                if (data[i].children) {
+                    $li.append(createChildren(data[i].children,1));
+                }
+                $menu.append($li);
+            }
+
+            $('#menu .link,#menu .clink').mouseover(function () {
+                $(this).addClass("hover");
+            });
+            $('#menu .link,#menu .clink').mouseout(function () {
+                $(this).removeClass("hover"); 
+            });
+            $('#menu .link').click(function () {
+                if ($(this).parent().hasClass('close'))
+                    $(this).parent().removeClass('close').addClass('open');
+                else
+                    $(this).parent().removeClass('open').addClass('close');
+            });
+
+        }, 'json');
+
+        @*$menu.tree({
+            url: '@Url.Action("GetNavMenus","Menu")',
+            onClick: function (node) {
+                if ('url' in node.attributes) {
+                    jump(node.text,node.attributes.url,node.id);
+                }
+            }
+        });*@
+
+        //tabs事件绑定
+        $("#tabs").delegate(".tabs-inner", "dblclick", function () {
+            var tab = $('#tabs').tabs('getSelected');
+            var url = $(tab.panel('options').content).attr('src');
+            if (url == null || url == '' || url == 'undefined')
+                return;
+            $('#tabs').tabs('update', { tab: tab, options: { content: createFrame(url) } });
+        })
+
+    })
+
+    function createChildren(data,index) {
+        var ul = $("<ul class='list'></ul>");
+        for (var i = 0; i < data.length; i++) {
+            var li = $("<li></li>");
+            li.append("<div class='clink' style='padding-left:" + (10 * (index + 3)) + "px;' onclick=\"jump('" + data[i].Name + "','" + data[i].Address + "','" + data[i].ID + "')\">" + data[i].Name + "</div>");
+            if (data[i].children) {
+                li.append(createChildren(data[i].children,index+2));
+            }
+            ul.append(li);
+        }
+        return ul;
+    }
+    //创建frame
+    function createFrame(url) {
+        return '<iframe scrolling="auto" frameborder="0" src="' + url + '" style="width:100%;height:99%;"></iframe>';
+    }
+    function jump(text, url, id) {
+        if (url == '')
+            return;
+        if ($("#tabs").tabs("exists", text) == false) {
+            addnode(text, url, id);
+        }
+        else {
+            $('#tabs').tabs('select', text)
+        }
+    }
+    function addnode(text, url, id) {
+        $("#tabs").tabs('add', {
+            title: text,
+            closable: true,
+            id: id,
+            bodyCls: 'tabContent',
+            content: createFrame(url)
+        });
+    }
+</script>
+
+<style>
+    #menu { position: relative; left: 0; top: 0; }
+    #menu .link {display: block;position:relative; overflow: hidden; zoom:1;height: 50px; line-height: 50px; cursor: pointer; border-bottom: solid 1px #D3D3D3; padding-left: 30px; font-size: 1.2em; color: gray; background-color: #f3f4f3;  }
+
+    #menu .hover { background-color: #daeef5; }
+    #menu .arrow { position: absolute; width: 5px; height: 5px; top: 22px; left: 10px; background-color: gray; }
+    #menu .close .arrow { background: url("../../content/images/down.png") no-repeat; }
+    #menu .open .arrow { background: url("../../content/images/up.png") no-repeat; }
+    #menu .color { position: absolute; width: 8px; height: 8px; top: 21px; right: 21px; -moz-border-radius: 3px 3px 3px 3px; -webkit-border-radius: 3px 3px 3px 3px; border-radius: 3px 3px 3px 3px; font-size:1px;}
+    #menu .clink { overflow:hidden;height: 50px; line-height: 50px; cursor: pointer; border-bottom: solid 1px #D3D3D3; font-size: 1em; color: gray;  }
+    #menu .close .list{display:none;}
+</style>

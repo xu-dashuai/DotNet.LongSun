@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>南顺鳄鱼园 @(ViewBag.Title)</title>
+    <meta name="keywords" content="鳄鱼园, 南顺鳄鱼园, 厦门南顺鳄鱼园, 鳄鱼制品, 鳄鱼药物, 鳄鱼美食, 旅游产业, 国家3A级景区, 中国最大室内鳄鱼园">
+    <meta name="description" content="@ViewBag.Description">
+    <script src="@Url.Content("~/Scripts/jquery/jquery-1.10.2.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/pharos.js")"></script>
+    <link href="@Url.Content("~/Content/reset.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/default/global.css")" rel="stylesheet" />
+</head>
+<body>
+    <div class="header">
+        <div class="wrap">
+            <div class="w1000">
+                @Html.Partial("_PartialNav")
+            </div>
+        </div>
+    </div>
+
+    <div class="w1000 clearfix">
+        <div class="fl-l clearfix leftnav">
+            @Html.Partial("_PartialWeather")
+            @Html.Partial("_PartialHomeMenu")
+            @Html.Partial("_PartialMessage")
+            @Html.Partial("_PartialLink")
+        </div>
+        <div class="fl-r clearfix rightcontent">
+            @RenderBody()
+        </div>
+    </div>
+
+    <div class="footer">
+        电话：0592-6068699   传真：0592-6068100  地址：厦门集美旅游商城A幢鳄鱼园大厦  闽ICP备05024499号-1
+        <a target="_blank" href="/backend/Account/login">管理</a>
+        <a href="http://www.xmpharos.com" target="_blank" style="margin-left:20px;">
+            <img src="~/Content/default/images/home/footer_logo.png" style="vertical-align:middle;" />
+        </a>
+    </div>
+    <div class="m-btk">
+        <div class="item1"></div>
+        <div class="item2"></div>
+    </div>
+
+    <script>
+        $(function () {
+            $(".m-btk").click(function () {
+                window.location = "@Url.Action("Index","Ticket")";
+            });
+            $(".m-btk").mouseover(function () {
+                $(".m-btk .item1").stop().animate({ bottom: 50 }, 300);
+            });
+            $(".m-btk").mouseout(function () {
+                $(".m-btk .item1").stop().animate({ bottom: 0 }, 300);
+            });
+
+
+        })
+    </script>
+    <!--[if lte  IE 6]>
+        <script>
+            $(function () {
+                resetbtk();
+                $(window).scroll(function () {
+                    resetbtk();
+                });
+
+            })
+
+            function resetbtk() {
+                $(".m-btk").stop().animate({ bottom: 50 - document.body.scrollTop }, 500);
+            }
+        </script>
+    <![endif]-->
+
+</body>
+</html>

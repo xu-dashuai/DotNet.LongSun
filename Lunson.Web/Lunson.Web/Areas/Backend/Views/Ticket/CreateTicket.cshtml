@@ -1,0 +1,100 @@
+﻿@{
+    ViewBag.Title = "添加新票";
+    var ticketstatus = EnumHelper.GetList(typeof(OnOffState));
+    ticketstatus.ForEach(a => { if (a.Text == "禁用")a.IsSelected = true; });
+    
+    Layout = "~/Areas/Backend/Views/Shared/_LayoutForm.cshtml";
+}
+
+<div class="default-form">
+    @using (Html.BeginForm("EditTicket", "Ticket", FormMethod.Post, new { id = "ticketForm" }))
+    {
+        <h1>基本信息</h1>
+        <div class="content">
+            @Form.Item("票名", "text", "Name", "*")
+            @Form.Item("当前价", "number", "CurPrice", "*", 0)
+            @Form.Item("原价", "number", "PrePrice", "", 0)
+            @*@Form.Item("过期天数", "number", "OverDueDay", "", 0)*@
+            @Form.Select("状态", ticketstatus, "Status", "*")
+            @Form.Item("简述", "textarea", "Resume", "")
+            @Form.Item("地址", "text", "Address", "")
+            <input type="hidden" name="MainImgID" />
+            <input type="hidden" name="ID" value="" />
+        </div>
+
+        <h1>缩略图</h1>
+        <div class="content">
+            <input type="file" name="pic" id="pic" onchange="uploadthumb();" />
+            <div id="img">
+
+            </div>
+        </div>
+        <h1>详细描述</h1>
+    <textarea name="Description" id="Description" style="height:450px; width:100%"></textarea>
+    }
+</div>
+
+
+<script type="text/javascript">
+    $(function () {
+        window.top.$("body").data('createForm', $);
+
+        $('#Description').xheditor({ html5Upload: false, upLinkUrl: "Upload1", upLinkExt: "zip,rar,txt", upImgUrl: "Upload1", upImgExt: "jpg,jpeg,gif,png", upFlashUrl: "Upload1", upFlashExt: "swf", upMediaUrl: "Upload1", upMediaExt: "wmv,avi,wma,asf,mp3" });
+
+        $(".msg").each(function () {
+            $(this).data("msg", $(this).text());
+        });
+
+        $(".default-form #ticketForm").submit(function () {
+            $(".msg").each(function () {
+                $(this).text($(this).data("msg"));
+            });
+
+            var json = pharos.json.formtojson($(this));
+            pharos.json.edit(json, "Description", $("#Description").val());
+
+            $.ajax({
+                url: '@Url.Action("EditTicket")',
+                data: json,
+                dataType: 'json',
+                type: 'post',
+                async: false,
+                success: function (data, status) {
+                    if (data.validate) {
+                        pharos.easyui.alert('提示', '保存成功');
+                        pharos.easyui.dialog.topClose("createTicket");
+                        pharos.easyui.dialog.curJquery("createTicket")("#ticket").datagrid("reload");
+                    }
+                    else {
+                        if (data.target == "") {
+                            pharos.easyui.alert('系统异常', data.msg);
+                        }
+                        else {
+                            $("input[name=" + data.target + "]").parent().find(".msg").text(data.msg);
+                        }
+                    }
+                },
+                error: function (e) {
+                    pharos.easyui.alert(e.status, e.statusText);
+                }
+            });
+            return false;
+        });
+    })
+
+    function uploadthumb() {
+        pharos.upload.ajaxfileupload.upload('pic', '@Url.Action("UploadThumb")', '@Url.Action("GetThumbMsg")',
+            function (data) {
+                if (data.validate) {
+                    $('input[name=MainImgID]').val(data.id);
+                    $("#img").html("<img src=\"" + data.url + "_thumb.jpg\" width='200'/>");
+                }
+                else {
+                    pharos.easyui.alert('错误', data.msg);
+                }
+            }, function (e) {
+                pharos.easyui.alert(e.status, e.statusText);
+            })
+    }
+
+</script>

@@ -1,0 +1,55 @@
+﻿/*登录页*/
+#login .head { position: relative; height: 70px; background: #2d3339 url('images/login/logo.png') no-repeat; }
+#login .content { width: 380px; height: 473px; position: relative; margin-top: 30px; margin-left: 50%; left: -190px; background: url('images/login/login.png') no-repeat; z-index: 100; }
+#login #UserName { position: absolute; top: 131px; left: 92px; height: 16px; padding: 18px 10px; width: 233px; border: 0; outline: none; }
+#login #Password { position: absolute; top: 226px; left: 92px; height: 16px; padding: 18px 10px; width: 233px; border: 0; outline: none; }
+#login #remember { position: absolute; top: 310px; left: 30px; color: white; font-size: 1.2em; }
+#login #remember input { vertical-align: middle; cursor: pointer; }
+#login #submit { position: absolute; display: block; cursor: pointer; width: 315px; height: 53px; top: 358px; left: 33px; }
+#login #submit:hover { background-color: white; filter: alpha(opacity=10); -moz-opacity: 0.1; -khtml-opacity: 0.1; opacity: 0.1; }
+#login .msg { text-align: center; color: #e2315d; }
+#login p { padding: 1em 0; }
+#login #UserName, #login #Password { _width: 233px; _height: 52px; _padding: 0 10px; _line-height: 52px; }
+
+/*首页*/
+.header { background: #2d3339 url('images/login/logo.png') no-repeat; position: relative; height: 70px; line-height: 70px; color: #dfdfdf; text-align: right; padding-right: 20px; }
+.header a { color: #dfdfdf; margin-left: 10px; }
+.header i { margin-left: 10px; font-style: normal; }
+.footer { text-align: center; line-height: 32px; position:relative;height:32px;overflow:hidden;}
+.footer img { vertical-align: middle; margin-right: 20px; }
+
+/*菜单*/
+
+.tree-node{padding:2px 0;}
+/*.messager-body{text-align:center;}*/
+.rowactive{background-color:#daeef5;}
+#toolbar{padding:10px;}
+#toolbar a.l-btn{margin-right:5px;}
+
+
+/*表单*/
+.default-form{padding:20px;}
+.default-form h1{font-size:1.2em;font-weight:normal;padding-bottom:1em;}
+.default-form .content{border: 1px solid #d9d9d9;padding:10px 20px;*overflow:auto;margin-bottom:20px;-webkit-border-radius: 5px; -moz-border-radius: 5px; -o-border-radius: 5px; -ms-border-radius: 5px; border-radius: 5px;}
+.default-form .content .clearfix{padding-bottom:10px;}
+
+.default-form .content .clearfix label{width:80px;height:30px;line-height:30px;float:left;}
+.default-form .content .clearfix div{float:left;}
+.default-form .content .input-textarea{overflow:auto;resize:none;width:200px;height:80px;_width:220px;padding:6px 10px;border: 1px solid #d9d9d9;vertical-align:middle;-webkit-border-radius: 5px; -moz-border-radius: 5px; -o-border-radius: 5px; -ms-border-radius: 5px; border-radius: 5px;}
+.default-form .content .input-radio{margin:10px 0;vertical-align:middle;*margin:5px 0;}
+.default-form .content .input-text{height:16px;line-height:16px;padding:6px 10px;border: 1px solid #d9d9d9;width:200px;_height:28px;_width:220px;vertical-align:middle;-webkit-border-radius: 5px; -moz-border-radius: 5px; -o-border-radius: 5px; -ms-border-radius: 5px; border-radius: 5px;}
+
+.default-form .content .select{background:url("/content/default/images/down.png") no-repeat 200px;position:relative;overflow:initial;cursor:pointer;width:200px;_width:220px;height:16px;line-height:16px;padding:6px 10px;border: 1px solid #d9d9d9;vertical-align:middle;-webkit-border-radius: 5px; -moz-border-radius: 5px; -o-border-radius: 5px; -ms-border-radius: 5px; border-radius: 5px;}
+.default-form .content .select ul{z-index:1000;max-height:200px;overflow:auto;position:absolute;width:220px;left:-1px;top:23px;padding-top:5px;border-width:0 1px 1px 1px;border-color:#d9d9d9;border-style:solid;background-color:white;-webkit-border-radius:0 0 5px 5px; -moz-border-radius: 0 0 5px 5px; -o-border-radius: 0 0 5px 5px; -ms-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px;}
+.default-form .content .select ul li{margin:0;padding:0;position:relative;}
+.default-form .content .select ul li a{display:block;padding:6px 10px;color:black;_display:inline-block;_width:100%;}
+.default-form .content .select ul li a:hover,.default-form .content .select ul li a.active{background-color:#d9d9d9;}
+
+
+
+.default-form .content .msg{margin-left:10px;color:red;display:inline-block;}
+
+
+
+
+

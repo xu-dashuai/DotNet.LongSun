@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Title = "友情链接管理";
+}
+
+<table id="dg"></table>
+
+<div id="toolbar">
+    <a class="easyui-linkbutton" data-options="iconCls: 'icon-add'" onclick="openFormDlg()">添加链接</a>
+</div>
+
+<script type="text/javascript">
+    $dg = $("#dg");
+    var statusSet = [];
+    @foreach (var x in EnumHelper.GetList<ActiveState>())
+    {
+        @:statusSet.push({ value: '@x.Value', text: '@x.Text' });
+    }
+
+    $(function () {
+        $dg.datagrid({
+            rownumbers: true,
+            fit: true,
+            border: false,
+            singleSelect: true,
+            url: "@Url.Action("GetLinks")",
+            toolbar: '#toolbar',
+            columns: [[
+                { field: 'Name', title: '网站名称', width: 150 },
+                { field: 'LinkUrl', title: 'URL地址', width: 150 },
+                { field: 'ShowOrder', title: '排序', width: 100 },
+                { field: 'ActiveState', title: '状态', width: 100, align:'center', formatter: function (value, row, index) { return pharos.json.getArrayValue(statusSet, 'value', value, 'text', value); } },
+                {field:'Editor', title:'操作', width: 150, align:'center', formatter: opFormat}
+            ]]
+        })
+    })
+
+    function opFormat(value, row) {
+        var html = "";
+        html += "<a href=\"javascript:void(0)\" onclick=\"openFormDlg('" + row.ID + "')\">编辑</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+        html += "<a href=\"javascript:void(0)\" onclick=\"deleteData('" + row.ID + "')\">删除</a>";
+        return html;
+    }
+
+    function openFormDlg(id) {
+        var popID = "formDiv";
+        var formTitle;
+        if (!id) { formTitle = "添加友情链接"; id = null }
+        else { formTitle = "编辑友情链接" }
+
+        pharos.easyui.dialog.topOpen(popID, {
+            width: 700,
+            height: 600,
+            modal: true,
+            title: formTitle,
+            href: '@Url.Action("LinkManageForm")?id=' + id,
+            buttons: [{
+                text: '保存',
+                iconCls: 'icon-save',
+                handler: function () { window.top.$('#formDiv form').submit(); }
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () { pharos.easyui.dialog.topClose(popID) }
+            }]
+        })
+    }
+
+    function deleteData(id) {
+        $.messager.defaults = { ok: "确定", cancel: "取消" };
+        $.messager.confirm('确认', '您确定要删除此记录吗？', function (r) {
+            if (r) {
+                $.ajax({
+                    url: '@Url.Action("DeleteLink")' + '?id=' + id,
+                    dataType:'json',
+                    type:'post',
+                    success: function () {
+                        $("#dg").datagrid("reload");
+                    }
+                })
+            }
+        });
+    }
+</script>

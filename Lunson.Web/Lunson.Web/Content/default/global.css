@@ -1,0 +1,68 @@
+﻿body{background:url('/content/default/images/home/footer_bg.jpg') bottom center no-repeat #feffed;}
+
+/*首页*/
+.header{padding-top:350px;position:relative;background:url('/content/default/images/home/header_bg.jpg') top center no-repeat;min-width:1000px;}
+.header .wrap{background:url('/content/default/images/home/nav_bg.jpg') top repeat-x;margin-bottom:20px;_height:60px;}
+.header .nav{height:60px;position:relative;line-height:65px;text-align:center;_position:absolute;_width:100%;_height:60px;}
+.header .nav a{font-size:1.4em;color:white;cursor:pointer;padding:0 25px;border-right:solid 1px #a7d912;}
+.header .nav a.last{border:0;}
+.header .nav a:hover,.header .nav a.active{color: #f29a0e;}
+
+
+.w1000{width:1000px;position:relative;margin:0 auto;_left:50%;_margin-left:-500px;}
+
+/*买票的鳄鱼*/
+.m-btk{position:fixed;left:50px;bottom:50px;cursor:pointer;_position:absolute;}
+.m-btk .item1{width:125px;height:172px;position:absolute;bottom:0;left:10px;background:url('images/ey.png') no-repeat left bottom;z-index:100;}
+.m-btk .item2{width:145px;height:155px;position:absolute;bottom:0;background:url('images/ey.png') no-repeat left top;z-index:110;}
+
+/*左导航*/
+.leftnav{width:250px;}
+#weather{position:relative;height:117px;overflow:hidden;background:url('/content/default/images/home/weather_bg.png') no-repeat;}
+#weather h1{font-size:1.4em;font-weight:normal;color:#71531d;padding:30px 0 0 20px;}
+#weather .time{font-size:1.2em;color:#71531d;padding:5px 0 5px 50px;}
+#weather iframe{margin-left:40px;}
+
+.leftnav .menu{position:relative;height:376px;overflow:hidden;background:url('/content/default/images/home/menu_bg.png') no-repeat;margin-top:20px;}
+.leftnav .menu ul{margin-top:25px}
+.leftnav .menu ul li{margin-left:80px;height:43px;line-height:43px;position:relative;}
+.leftnav .menu a{font-size:1.5em;color:#912900;}
+.leftnav .menu a.active,.leftnav .menu a:hover{color: #f29a0e;}
+.leftnav .showtime{position:relative;height:228px;overflow:hidden;background:url('/content/default/images/home/panel_bg1.png') no-repeat;}
+.leftnav .showtime h1{position:relative;height:30px;line-height:30px; background:url('/content/default/images/home/title.png') top left no-repeat;font-size:1.4em;color: #71531d;padding-left:20px;font-weight:normal;margin:5px 10px;}
+.leftnav .showtime table{margin-left:20px;color: #71531d;border-collapse:collapse;}
+.leftnav .showtime table td{padding:3px;}
+
+
+.leftnav .phone{position:relative;height:72px;overflow:hidden;background:url('/content/default/images/home/panel_bg2.png') no-repeat;margin-top:20px;color:#71531d;}
+.leftnav .shophours{padding:20px 0 5px 30px;}
+.leftnav .tickethotline{padding:0 0 0 30px;}
+
+.links li{text-align:center;margin-bottom:10px;}
+
+/*底部*/
+.footer{min-width:1000px;height:100px;position:relative;background:url('/content/default/images/home/footer_bg1.png') center repeat-x;text-align:center;line-height:100px;color:white;font-size:1em;}
+
+
+/*内容*/
+.rightcontent{width:730px;background-color:#eff6d4;min-height: 1248px;_height:830px !important;overflow:visible;}
+.feed-wrap{padding:0 60px 40px 60px;color: #6a7744;}
+.feed-wrap .nav{color: #6a7744;padding-bottom:15px;border-bottom:solid 2px #e1efc3;}
+.feed-wrap .nav span,.feed-wrap .nav a{font-size:1.2em;color: #6a7744;vertical-align:middle;font-weight:bold;}
+.feed-wrap .feedlist li{height:30px;line-height:30px;color: #6a7744;border-bottom:solid 2px #e1efc3;position:relative;}
+.feed-wrap .feedlist li span{float:right;margin-right:20px;font-size:1em;}
+.feed-wrap .feedlist li a{font-size:1.2em;color: #6a7744;}
+.feed-wrap .pager{padding:20px 0;}
+.feed-wrap .pager span,.feed-wrap .pager a{font-size:1.2em;color: #6a7744;margin-right:10px;}
+.feed-wrap .pager .cur{color:black;}
+.feed-wrap .title{margin:10px 0;font-size:1.4em;color: #f29a0e;font-weight:normal;}
+.feed-wrap .time{margin:10px 0;font-size:1.2em;}
+.feed-wrap .content{font-size:1.4em;width:610px;position:relative;}
+.feed-wrap .content img{max-width:590px; _width: expression((document.documentElement.clientWidth||document.body.clientWidth)>590?"590px":"");}
+.feed-wrap .content p{line-height:2;margin-bottom:20px;}
+
+.special-nav{padding:0 0 10px 0;font-weight:bold;color:#38730e;}
+.special-nav label{margin-right:20px;}
+.special-nav a{display:inline-block;text-align:center;width:70px;height:24px;line-height:24px;vertical-align:middle;color:#38730e;background:url("/content/default/images/home/title_bg2.png") no-repeat;}
+.special-nav a.active{background:url("/content/default/images/home/title_bg1.png") no-repeat;color:white;}
+

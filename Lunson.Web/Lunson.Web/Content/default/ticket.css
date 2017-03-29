@@ -1,0 +1,219 @@
+﻿/*首页样式*/
+.content{
+	font-size:1em;
+	color:#fe5a23;
+	width:96.42em;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:0.5em;
+	}
+.sight{
+	width:96.42em;
+	height:14.5em;
+	margin-left:auto;
+	margin-right:auto;
+	background-image:url(../default/images/ticket/nav.png);
+	background-repeat:no-repeat;
+	margin-top:1em;
+	}
+.sight span{ display:none} 
+.sight:hover span{ 
+    display:block; 
+	z-index:999999;
+	} 
+#pricebox{float:left;
+	width:13em;
+	color:#a8a8a8;
+	z-index:999999;} 
+.sight_img{
+	float:left;
+	}
+.sight_text{
+	width:532px;
+	float:left;
+	padding-top:3em;
+	padding-left:5em;
+	}
+.sight_title{
+	font-size:21px;
+	color:#b9cd4b;
+	}
+.sight_explain{
+	color:#fea168;
+	padding-top:1em;
+	}
+.sight_address{
+	color:#a8a8a8;
+	}
+.price{
+	color:#ff7700;
+	font-size:24px;
+	margin-left:55px;
+	margin-top:25px;
+	}
+.price_before{
+	color:#a8a8a8;
+	font-size:1em;
+	margin-left:45px;
+	text-decoration: line-through;
+	}
+.quantity{
+	width:140px;
+	height:25px;
+	margin-top:8px;
+	margin-left:25px;
+	}
+.quantity_reduce{
+	width:20px;
+	height:20px;
+	float:left;
+	margin-left:5px;
+	border:#dddddd 1px solid;
+	line-height:20px;
+	text-align:center;
+	color:#dddddd;
+	}
+.quantity_reduce a{color:#dddddd;}
+.quantity_input_text{
+	width:30px;
+	height:20px;
+	float:left;
+	border:#dddddd 1px solid;
+	}
+.quantity_add{
+	width:20px;
+	height:20px;
+	float:left;
+	border:#dddddd 1px solid;
+	line-height:19px;
+	text-align:center;
+	}
+.quantity_add a{color:#9e9e9e;}
+.buy{
+	background-image:url(../default/images/ticket/buy.png);
+	width:107px;
+	height:31px;
+	font-size:15px;
+	text-align:center;
+	padding-top:5px;
+	background-repeat:no-repeat;
+	margin-left:25px;
+	margin-top:10px;
+	}
+.buy a{
+	color:#FFF;
+	display:block;
+	}
+.group_buy{
+	width:7em;
+	height:2em;
+	background-color:#ff7700;
+	border-radius:3px;
+	-webkit-border-radius: 3px;
+    -moz-border-radius:3px;
+	float:right;
+	margin-top:1em;
+	line-height:2em;
+	text-align:center;
+	margin-right:1.3em;
+	font-size:1.5em;
+	}
+.group_buy a{
+	color:#FFF;
+	}
+
+/*明细*/
+.tablebox{
+	width:1170px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:50px;
+	}
+.available{
+	width:208px;
+	height:40px;
+	border:1px solid #b9cd4b;
+	font-size:18px;
+	color:#b9cd4b;
+	text-align:center;
+	line-height:35px;
+	float:left;
+	}
+.order{
+	width:208px;
+	height:40px;
+	border-top:1px solid #e4e4e4;
+	border-right:1px solid #e4e4e4;
+	font-size:18px;
+	color:#e4e4e4;
+	text-align:center;
+	line-height:35px;
+	float:left;
+	}
+.t_able{
+	width:1160px;
+	height:580px;
+	border:1px solid #b9cd4b;
+	}
+.t_able_green{
+	background-color:#eaf1ca;
+	width:1116px;
+	height:40px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:20px;
+	line-height:40px;
+	}
+.t_able_input{
+	width:18px;
+	height:18px;
+	margin-left:25px;
+	float:left;
+	}
+.t_able_ticket{
+	width:1050px;
+	margin-left:auto;
+	padding-top:20px;
+	margin-right:auto;
+	height:120px;
+	}
+.t_able_ticket_bg{
+	width:936px;
+	height:120px;
+	background-image:url(../Images/ticket.png);
+	float:left;
+	margin-left:40px;
+	}
+.t_able_ticket_img{
+	width:270px;
+	height:120px;
+	float:left;
+	}
+.t_able_ticket_text{
+	width:318px;
+	float:left;
+	padding-top:2em;
+	padding-left:2.5em;
+	}
+.t_able_ticket_information{
+	float:left;
+	margin-left:55px;
+	padding-top:35px;
+	font-size:14px;
+	}
+.t_able_ticket_return{
+	float:right;
+	font-size:18px;
+	color:#ff7800;
+	margin-top:25px;
+	margin-right:15px;
+	}
+.return{
+	color:#ff7700;
+	text-align:right;
+	font-size:18px;
+	padding:15px;
+	}
+.return a{
+	color:#ff7700;
+	}

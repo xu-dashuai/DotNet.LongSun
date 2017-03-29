@@ -1,0 +1,33 @@
+﻿@model Lunson.Domain.Entities.FeedType
+@{
+    var nav = (ViewBag.id == null ? "" : (ViewBag.id as string));
+    nav = System.Text.RegularExpressions.Regex.Replace(nav, @"[^a-zA-Z]", "").ToLower();
+    var feed = ViewBag.feed as Lunson.Domain.Entities.Feed;
+    ViewBag.Title = Model.Name;
+    ViewBag.Description = Model.Description;
+}
+
+<script type="text/javascript">
+    $(function () {
+        $("a[data-nav=@nav]").addClass("active");
+    })
+</script>
+
+
+@Html.Partial("_PartialSwf", (Model == null || Model.Annex == null) ? null : Model.Annex)
+
+<div class="feed-wrap">
+
+    <div class="nav">
+        <span>当前位置：</span>
+        <a href="/">网站首页</a> >>
+        <a href="/@Model.Code">@Model.Name</a>
+    </div>
+
+    <h1 class="title">@feed.Title</h1>
+    <p class="time">@Convert.ToDateTime(feed.PublishOn + "").ToString("yyyy年MM月dd日")</p>
+
+    <div class="content" style="text-indent: 0.75em">
+        @Html.Raw(feed.Content)
+    </div>
+</div>

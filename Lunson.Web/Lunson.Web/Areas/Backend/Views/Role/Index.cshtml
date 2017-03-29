@@ -1,0 +1,96 @@
+﻿@{
+    ViewBag.Title = "角色管理";
+}
+
+<div id="toolbar">
+    <a class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="openFormDlg()">添加角色</a>
+</div>
+<table id="dg"></table>
+
+<script type="text/javascript">
+    $dg = $("#dg");
+    var statusSet = [];
+    @foreach (var x in EnumHelper.GetList<ActiveState>())
+    {
+        @:statusSet.push({ value: '@x.Value', text: '@x.Text' });
+    }
+
+    $(function () {
+        $dg.datagrid({
+            url: '@Url.Action("GetDataAll","Role")',
+            toolbar: '#toolbar',
+            title: '<span style="color:#ff6a00;">双击绑定角色权限</span>',
+            fit: true,
+            border: false,
+            rownumbers: true,
+            pagination: true,
+            singleSelect: true,
+            columns: [[
+                { title: '角色名称', field: 'Name', width: 100 },
+                { title: '角色代码', field: 'Code', width: 100 },
+                { title: '角色描述', field: 'Description', width: 300 },
+                { title: '活动状态', field: 'Status', width: 100, align: 'center', formatter: function (value, row, index) { return pharos.json.getArrayValue(statusSet, 'value', value, 'text', value); } },
+                { title: '操作', field: 'Editor', width: 100, align: 'center', formatter: opFormat }
+            ]],
+            onDblClickRow: function (rowIndex, rowData) {
+                pharos.easyui.dialog.topOpen('Permission', {
+                    width: 700,
+                    height: 500,
+                    modal: true,
+                    title: '角色权限绑定',
+                    href: '@Url.Action("Index","Permission")?id=' + rowData.ID
+                })
+            }
+        })
+    })
+
+    function opFormat(value, row) {
+        var html = "";
+        html += "<a href=\"javascript:void(0)\" onclick=\"openFormDlg('" + row.ID + "')\">编辑</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+        html += "<a href=\"javascript:void(0)\" onclick=\"deleteData('" + row.ID + "')\">删除</a>";
+        return html;
+    }
+
+    function openFormDlg(roleID) {
+        var popID = "formDiv";
+        var formTitle;
+        if (!roleID) { formTitle = "添加角色"; roleID = null }
+        else { formTitle = "编辑角色" }
+
+        pharos.easyui.dialog.topOpen(popID, {
+            width: 700,
+            height: 320,
+            modal: true,
+            title: formTitle,
+            href: '@Url.Action("RoleManageForm")?roleID=' + roleID,
+            buttons: [{
+                text: '保存',
+                iconCls: 'icon-save',
+                handler: function () { window.top.$('#formDiv form').submit();  }
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () { pharos.easyui.dialog.topClose(popID) }
+            }]
+        })
+    }
+
+    function deleteData(roleID) {
+        $.messager.defaults = { ok: "确定", cancel: "取消" };
+        $.messager.confirm('确认', '您确定要删除此角色吗？', function (r) {
+            if (r) {
+                $.ajax({
+                    url: '@Url.Action("DeleteData", "Role")' + '?roleID=' + roleID,
+                    success: function (data, status) {
+                        if (data.validate == false) {
+                            alert(data.msg);
+                            return;
+                        }
+                        $("#dg").datagrid("reload");
+                    }
+                })
+            }
+        });
+    }
+
+</script>

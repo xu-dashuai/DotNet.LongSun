@@ -1,0 +1,134 @@
+﻿@model IQueryable<TicketDetail>
+@using Lunson.Domain.Entities
+@using Pharos.Framework
+
+
+<style>
+    input {
+        vertical-align: middle;
+    }
+</style>
+<script src="~/Scripts/easyui/jquery.easyui.min.js"></script>
+<link href="~/Content/easyui/metro/easyui.css" rel="stylesheet" />
+<div style="padding:10px;background-color:#eaf0ca;margin-bottom:10px;">
+    <input id="selectAll" type="checkbox" />全选 (最多可选五张组合成一个二维码同时使用) <span style="color: #ff7700">单击二维码显示大图</span><span style="color:red;font-weight:bold;float:right">*请记得拍照您的门票才能通过检票！</span>
+</div>
+
+<div class="ticketlist">
+    <div class="wrap">
+        <ul class="availableticket">
+            @if (Model.Count() > 0)
+            {
+                foreach (var x in Model)
+                {
+                    <li class="clearfix">
+                        <span class="select"><input type="checkbox" data-no="@x.TicketNO" /></span>
+                        <div class="item">
+                            <img src="@(x.Annex.Url)_thumb.jpg" />
+                            <div class="detail">
+                                <p class="name">@x.Name</p>
+                                <p class="price">￥@x.CurPrice</p>
+                            </div>
+                            <a href="javascript:;" onclick="showimg('@x.TicketNO')"><img style="width:80px;height:80px;background-color:#808080;margin-top:10px;" src="/booklet/qr/@x.TicketNO" /></a>
+                            <div class="time" style="width:180px;">
+                                <p class="status">未使用</p>
+                                <p class="buytime">购买时间：@x.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss")</p>
+                            </div>
+                        </div>
+                    </li>
+                }
+            }
+            <li style="text-align:right;">
+                <a id="refund">退票</a>
+                <a class="btn-groupbuy" onclick="openNewDiv(); return false;">生成组合二维码</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+
+    $(function () {
+        //全选
+        $("#selectAll").change(function () {
+            var chk = $(this).is(":checked");
+            $("input[type='checkbox']").each(function (i, item) {
+                var itemchk = $(item).is(":checked");
+                if (chk != itemchk)
+                    $(item).click();
+            })
+        })
+        //退票
+        $("#refund").click(function () {
+            var allTicket = getAllTicket();
+            if (allTicket != "") {
+                if (confirm("确认提交退票申请吗？")) {
+                    $.post("@Url.Action("Refund","Ticket")", "nos=" + allTicket, function (data) {
+                        if (data.Successed) {
+                            alert("退票申请成功！请登录工作人员确认退款！")
+                            window.location.reload();
+                        }
+                        else {
+                            alert(data.Message);
+                        }
+                    }, "json")
+                }
+            }
+            else {
+                alert("请先选中要退订的票！");
+            }
+        })
+    })
+
+    function getAllTicket() {
+        var allTicket = "";
+        $("li input[type='checkbox']").each(function (i, item) {
+            var isTrue = $(item).is(":checked");
+            if (isTrue) {
+                var no = $(item).attr("data-No");
+                if (allTicket == "") {
+                    allTicket = no;
+                }
+                else {
+                    allTicket += ("," + no);
+                }
+            }
+        })
+        return allTicket;
+    }
+
+
+</script>
+
+<div id="win" class="easyui-dialog" data-options="title:'二维码',border:false,width: 300,height:350,closed:true,modal:true" style="text-align:center;">
+    <p class="msg" style="padding:10px;"><span class="num"></span>张鳄鱼园门票</p>
+    <img style="width:200px;height:200px;" />
+    <p style="padding:10px;">
+        请将此二维码拍照下来或打印出来，在园区门口刷此二维码，验证通过即可进入
+    </p>
+</div>
+
+<script language="javascript">
+    function openNewDiv() {
+        var ticket = getAllTicket();
+        if (ticket == "") {
+            return false;
+        }
+        if ((ticket.split(',').length) > 5) {
+            alert("组合生成二维码一次最多支持 5 张，您选的太多了！");
+            return false;
+        }
+        $("#win").find("img").attr("src", "/booklet/qr/" + ticket);
+        $("#win").find(".num").text("多");
+        $("#win").dialog({ title: '组合二维码' });
+        $("#win").dialog("open").dialog("center");
+
+    }
+    function showimg(ticket) {
+        $("#win").find("img").attr("src", "/booklet/qr/" + ticket);
+        $("#win").find(".num").text("一");
+        $("#win").dialog({ title: '二维码' });
+        $("#win").dialog("open").dialog("center");
+    }
+    //<img style='width:200px;height:200px;' src='/booklet/qr/" + ticket + "' />
+</script>

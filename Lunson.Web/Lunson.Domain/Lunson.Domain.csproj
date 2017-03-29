@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E25EB290-A1FF-4CED-BF24-021C6283D65A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Lunson.Domain</RootNamespace>
+    <AssemblyName>Lunson.Domain</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.2\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Entities\Annex.cs" />
+    <Compile Include="Entities\BaseEntity.cs" />
+    <Compile Include="Entities\Customer.cs" />
+    <Compile Include="Entities\CustomerLoginLog.cs" />
+    <Compile Include="Entities\Feed.cs" />
+    <Compile Include="Entities\FeedType.cs" />
+    <Compile Include="Entities\Link.cs" />
+    <Compile Include="Entities\Order.cs" />
+    <Compile Include="Entities\OrderDetail.cs" />
+    <Compile Include="Entities\OrderHist.cs" />
+    <Compile Include="Entities\PayLog.cs" />
+    <Compile Include="Entities\Permission.cs" />
+    <Compile Include="Entities\PhoneCode.cs" />
+    <Compile Include="Entities\RolePermission.cs" />
+    <Compile Include="Entities\Sys_Menu.cs" />
+    <Compile Include="Entities\Sys_Role.cs" />
+    <Compile Include="Entities\Sys_User.cs" />
+    <Compile Include="Entities\Sys_UserRole.cs" />
+    <Compile Include="Entities\Ticket.cs" />
+    <Compile Include="Entities\TicketDetail.cs" />
+    <Compile Include="Entities\TicketDetailHist.cs" />
+    <Compile Include="Entities\TicketHist.cs" />
+    <Compile Include="Entities\TicketRefund.cs" />
+    <Compile Include="Entities\TradeLog.cs" />
+    <Compile Include="Entities\UserLoginLog.cs" />
+    <Compile Include="Enum.cs" />
+    <Compile Include="Mapping\AnnexMap.cs" />
+    <Compile Include="Mapping\CustomerLoginLogMap.cs" />
+    <Compile Include="Mapping\CustomerMap.cs" />
+    <Compile Include="Mapping\FeedMap.cs" />
+    <Compile Include="Mapping\FeedTypeMap.cs" />
+    <Compile Include="Mapping\LinkMap.cs" />
+    <Compile Include="Mapping\OrderDetailMap.cs" />
+    <Compile Include="Mapping\OrderHistMap.cs" />
+    <Compile Include="Mapping\OrderMap.cs" />
+    <Compile Include="Mapping\PayLogMap.cs" />
+    <Compile Include="Mapping\PermissionMap.cs" />
+    <Compile Include="Mapping\PhoneCodeMap.cs" />
+    <Compile Include="Mapping\RolePermissionMap.cs" />
+    <Compile Include="Mapping\Sys_MenuMap.cs" />
+    <Compile Include="Mapping\Sys_RoleMap.cs" />
+    <Compile Include="Mapping\Sys_UserMap.cs" />
+    <Compile Include="Mapping\Sys_UserRoleMap.cs" />
+    <Compile Include="Mapping\TicketDetailHistMap.cs" />
+    <Compile Include="Mapping\TicketDetailMap.cs" />
+    <Compile Include="Mapping\TicketHistMap.cs" />
+    <Compile Include="Mapping\TicketMap.cs" />
+    <Compile Include="Mapping\TicketRefundMap.cs" />
+    <Compile Include="Mapping\TradeLogMap.cs" />
+    <Compile Include="Mapping\UserLoginLogMap.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

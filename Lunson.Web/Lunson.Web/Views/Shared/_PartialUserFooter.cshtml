@@ -1,0 +1,28 @@
+﻿
+    <div class="footer">
+        <div class="wrap">
+            <div class="w1000">
+                <p>电话：0592-6068699 &nbsp;&nbsp; 传真：0592-6068100</p>
+                <p>地址：厦门集美旅游商城A幢鳄鱼园大厦</p>
+                <p>版权所有 闽ICP备05024499号-1</p>
+            </div>
+        </div>
+    </div>
+
+<script>
+    $(function () {
+        //resetfooter();
+       // setInterval(resetfooter,1000);
+    })
+
+    function resetfooter() {
+        var h = $("#container").height();
+        var htemp = $(window).height();
+        if (h < htemp + 100) {
+            $(".footer").css("margin-top", htemp - h-100);
+        }
+        else {
+            $(".footer").css("margin-top", 0);
+        }
+    }
+</script>

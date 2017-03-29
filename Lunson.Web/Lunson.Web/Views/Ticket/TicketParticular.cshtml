@@ -1,0 +1,109 @@
+﻿@model Lunson.Domain.Entities.Ticket
+@{
+    ViewBag.Title = Model.Name;
+    ViewBag.Description = Model.Description;
+    ViewBag.label = "";
+    var imgs = ViewBag.imgs as IQueryable<Lunson.Domain.Entities.Annex>;
+    int i = 0;
+    ViewBag.num = 1;
+}
+
+<div class="w1000 ticketdetail">
+    <div class="wrap">
+        <h1>@Model.Name</h1>
+        <p class="msg">包罗万"鳄"，不可多得的鳄鱼展览园地</p>
+        <div class="clearfix detail">
+            <img src="@(Model.Annex.Url)_large.jpg" />
+            <div class="right">
+                <div class="clearfix item">
+                    <label>票价</label>
+                    <div class="price">
+                        @Model.CurPrice
+                    </div>
+                </div>
+                <div class="clearfix item">
+                    <label>有效期</label>
+                    <div>
+                        不限
+                    </div>
+                </div>
+                <div class="clearfix item">
+                    <label>数量</label>
+                    <div>
+                        @Html.Partial("_PartialNumBox", Model.ID)
+                    </div>
+                </div>
+
+                <a class="btn-groupbuy gobuy">立即购买</a>
+
+            </div>
+        </div>
+
+        <h1>门票介绍</h1>
+        <div style="padding-bottom:40px;border-bottom:#ccc solid 1px;">
+            @Html.Raw(Model.Description)
+        </div>
+
+
+        <h1>鳄鱼观赏</h1>
+        <ul class="show clearfix">
+            @foreach (var x in imgs)
+            { 
+                <li class="@((i-1)%3==0?"center":"")"><a href="@x.Url" target="_blank"><img src="@(x.Url)_thumb.jpg" /></a></li>
+                i++;
+            }
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(".gobuy").click(function () {
+        var num = $("input[name='num']").val();
+        var Id = $("input[name='num']").attr("data-target");
+        if (num > 0) {
+            if (Id != "") {
+                var json = { ID: Id, Num: num };
+                pharos.json.submit(json, "post", "/Ticket/TicketDetails");
+            }
+        }
+        else {
+            alert("请选择数量！");
+        }
+    })
+</script>
+<script type="text/javascript">
+    $("input[name=num]").keyup(function () {
+        var value = $(this).val();
+        try {
+            value = value.replace(/\D/g, '');
+            $(this).val(Number(value));
+        }
+        catch (e) {
+            $(this).val(1);
+        }
+    });
+    $(".decrease").click(function () {
+        var value = $(this).parent().find("input[name='num']").val();
+        try {
+            value = value.replace(/\D/g, '');
+            value = Number(value) - 1;
+        }
+        catch (e) {
+            value = 1;
+        }
+        if (value < 0)
+            value = 0;
+        $(this).parent().find("input[name='num']").val(value);
+    });
+    $(".increase").click(function () {
+        var value = $(this).parent().find("input[name='num']").val();
+        try {
+            value = value.replace(/\D/g, '');
+            value = Number(value) + 1;
+        }
+        catch (e) {
+            value = 1;
+        }
+        $(this).parent().find("input[name='num']").val(value);
+    });
+</script>

@@ -1,0 +1,81 @@
+﻿@model Lunson.Domain.Entities.FeedType
+@{
+    var nav = (ViewBag.id == null ? "Introduction" : (ViewBag.id as string));
+    nav = System.Text.RegularExpressions.Regex.Replace(nav, @"[^a-zA-Z]", "").ToLower();
+    var feeds = ViewBag.feeds as Pharos.Framework.PagedList<Lunson.Domain.Entities.Feed>;
+    ViewBag.Title = Model.Name;
+    ViewBag.Description = Model.Description;
+}
+
+<script type="text/javascript">
+    $(function () {
+        $("a[data-nav=@nav]").addClass("active");
+        @if (nav == "mediareports" || nav == "pressrelease")
+        { 
+            @:$("a[data-nav=company]").addClass("active");
+        }
+    })
+</script>
+
+@if (Model != null && Model.Annex != null) {
+    @Html.Partial("_PartialSwf", Model.Annex)
+}
+else
+{
+    <br />
+    <br />
+}
+
+@*@Html.Partial("_PartialSwf", (Model == null || Model.Annex == null) ? null : Model.Annex)*@
+
+<div class="feed-wrap">
+
+    @if (nav == "mediareports" || nav == "pressrelease")
+    {
+        <div class="special-nav">
+            <label>公司咨询分类：</label>
+            <a data-nav="pressrelease" href="/PressRelease">新闻发布</a>
+            <a data-nav="mediareports" href="/MediaReports">媒体报道</a>
+        </div>
+    }
+    <div class="nav">
+        <span>当前位置：</span>
+        <a href="/">网站首页</a> >>
+        <a href="javascript:;" onclick="return false;">@Model.Name</a>
+    </div>
+
+    @if (feeds != null)
+    {
+        <ul class="feedlist">
+            @foreach (var x in feeds)
+            {
+                <li class="clearfix">
+                    <a href="/@Model.Code/show?fid=@x.ID">@x.Title
+                        @if (x.IsTop == 1)
+                        {
+                            <i style="color: #912900">&nbsp;&nbsp;[置顶]</i>
+                        }
+                        @if (x.IsRecommend == 1)
+                        {
+                            <i style="color: #F6931B">&nbsp;&nbsp;*推荐*</i>
+                        }
+                    </a>
+                    <span>
+                        @if (x.PublishOn != null)
+                        {
+                            @Convert.ToDateTime(x.PublishOn+"").ToString("[ yyyy-MM-dd ]")
+                        }
+                        else
+                        {
+                            @Convert.ToDateTime(x.CreatedOn+"").ToString("[ yyyy-MM-dd ]")
+                        }
+                    </span>
+                </li>
+            }
+        </ul>
+
+        @Html.Raw(Html.Pager(feeds))
+    }
+
+</div>
+

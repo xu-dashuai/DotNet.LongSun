@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+
+<html style="*overflow:auto;">
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <script src="@Url.Content("~/Scripts/jquery/jquery-1.10.2.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/pharos.js")"></script>
+    <link href="@Url.Content("~/Content/reset.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/default/userinfo.css")" rel="stylesheet" />
+</head>
+<body style="_overflow:auto;">
+    <div id="container">
+        <div class="header">
+            <div class="wrap">
+                <div class="w1000">
+                    <span class="logo">南顺鳄鱼园</span>
+                    <a class="url" href="/">www.losnun.com.cn</a>
+                    @Html.Partial("_PartialLogin")
+                    @Html.Partial("_PartialUserNav")
+                </div>
+            </div>
+        </div>
+
+        @RenderBody()
+    </div>
+    @Html.Partial("_PartialUserFooter")
+</body>
+</html>

@@ -1,0 +1,75 @@
+﻿@model Lunson.Web.Models.RegisterVM
+@{
+    ViewBag.Title = "前台注册";
+}
+
+@using (Html.BeginForm())
+{
+    <div class="loginwrap">
+        <h1>新用户注册</h1>
+        @*<p class="msg">
+            <label>用户名</label><input type="text" id="UserName" name="UserName" />
+            @Html.ValidationMessageFor(model => model.UserName)
+        </p>*@
+        <p class="msg">
+            <label>手机号</label><input type="text" id="Mobile" name="Mobile" value="@Html.ValueFor(model => model.Mobile)" />
+            @Html.ValidationMessageFor(model => model.Mobile)
+        </p>
+        <p class="msg">
+            <label>验证码</label><input type="text" id="MobileCode" name="MobileCode" style="width:80px;" value="@Html.ValueFor(model => model.MobileCode)" />
+            <a href="javascript:void(0);" class="btn-register" style="position:absolute;left:160px;top:0;height:30px;line-height:30px;font-size:1em;width:100px;" id="sendCheckCode" onclick="sendCode(this)">获取手机验证码</a>
+            @Html.ValidationMessageFor(model => model.MobileCode)
+        </p>
+        <p class="msg">
+            <label>密码</label><input type="password" id="Password" name="Password" value="@Html.ValueFor(model => model.Password)"/>
+            @Html.ValidationMessageFor(model => model.Password)
+        </p>
+        <p class="msg">
+            <label>确认密码</label><input type="password" id="ConfirmPassword" name="ConfirmPassword" value="@Html.ValueFor(model => model.ConfirmPassword)" />
+            @Html.ValidationMessageFor(model => model.ConfirmPassword)
+        </p>
+        @*<p class="msg">
+            <label>显示名</label><input type="text" id="DisplayName" name="DisplayName" />
+            @Html.ValidationMessageFor(model => model.DisplayName)
+        </p>*@
+        <p class="read">
+            <input type="checkbox" class="remenber" id="agree" checked="checked" />
+            我已阅读并同意 <a href="@Url.Action("License")" id="license">会员注册协议</a>和<a href="@Url.Action("Policy")" id="policy">隐私保护政策</a>
+        </p>
+        <p class="btn">
+            <a class="btn-login" onclick="register(); return false;">注册</a>
+        </p>
+        <p>我已经有帐号</p>
+        <p>
+            <a class="btn-register" href="@Url.Action("Login")">马上登录</a>
+        </p>
+    </div>
+}
+
+<script type="text/javascript">
+    function register() {
+        if ($("#agree").is(':checked') == true) {
+            $("form").submit();
+        }
+        else {
+            alert("未同意会员注册协议和隐私保护政策无法注册，请您先勾选同意！");
+        }
+    }
+
+    function sendCode(e) {
+        if ($(e).hasClass("disabled"))
+            return;
+
+        $.post('@Url.Action("GetMobileCode")', { mobile: $('#Mobile').val() }, function (data) {
+            if (data.success == true) {
+                $("#sendCheckCode").addClass("disabled");
+                $("#sendCheckCode").text("已发送");
+                var y = self.setInterval(djs, 1000);
+            }
+            else {
+                alert(data.msg);
+            }
+        });
+    }
+
+</script>

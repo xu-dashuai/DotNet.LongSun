@@ -1,0 +1,65 @@
+﻿@{
+    ViewBag.Title = "我的票夹";
+    ViewBag.nav = "wallet";
+}
+
+<style type="text/css">
+    .return {
+        color: #ff7700;
+        text-align: right;
+        font-size: 18px;
+        padding: 15px;
+
+        margin-top:-100px
+    }
+
+    .return a {
+        color: #ff7700;
+    }
+</style>
+
+<div class="w1000 accountlist">
+
+    <ul class="clearfix nav">
+        <li class="active">可用门票<i></i></li>
+        <li class="">门票记录<i></i></li>
+    </ul>
+
+    <div class="content active">
+        @Html.Partial("_PartialAvailableTickets")
+    </div>
+    <div class="content">
+        @Html.Partial("_PartialTicketRecord")
+    </div>
+    <div class="return">
+        <a href="/">@Html.Raw("<<返回首页")</a>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $(".accountlist .nav li").click(function () {
+            if ($(this).hasClass("active")) {
+                return;
+            }
+
+            $(".accountlist .nav li").removeClass("active").removeClass("linel");
+            $(this).addClass("active");
+            var next = $(this).next();
+            if (next.length == 1) {
+                next.addClass("linel");
+            }
+            var index = $(".accountlist .nav li").index($(this));
+
+            $(".accountlist .content").removeClass("active");
+            $(".accountlist .content").eq(index).addClass("active");
+            $.cookie("booklet_tab", index);
+        });
+
+        var tabIndex = $.cookie("booklet_tab");
+        if (tabIndex == null)
+            $(".accountlist>.nav li").eq(0).click();
+        else
+            $(".accountlist>.nav li").eq(tabIndex).click();
+    })
+</script>

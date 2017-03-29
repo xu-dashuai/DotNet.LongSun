@@ -1,0 +1,161 @@
+﻿@model List<Lunson.Web.Models.TicketDetailVM>
+@{
+    ViewBag.Title = "Confirm";
+    Layout = "~/Views/Shared/_LayoutMobile.cshtml";
+}
+
+<div class="back"><a href="javascript:;" onclick="history.go(-1)">返回</a></div>
+
+<div class="all">
+    <div style="height:20px;"></div>
+    <div class="tel_check">确认您的手机号码：@ViewBag.Mobile</div>
+    @foreach (var x in Model)
+    {
+        ViewBag.num = x.Num;
+        <div class="ticket">
+            <div class="ticket_1">
+                <img src="@(x.ImgUrl)_thumb_for_mobile.jpg" width="90" height="90" class="ticket_img" />
+                <div>
+                    <div class="col-xs-8 col-sm-10 col-md-10" style="float:left;">
+                        <span class="ticket_title">@x.Name</span>
+                        <div class="ticket_price_1" style="width:100%;">￥@x.CurPrice<span class="allprice_1 allprice" style="float:right;" data-price="@x.AllPrice" data-target="@x.ID" data-singleprice="@x.CurPrice">￥@x.AllPrice</span></div>
+
+                        <span class="ticket_detail">@x.Resume</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ticket_number">
+                <span class="ticket_number_decrease glyphicon-minus glyphicon" style="float:left;"></span>
+                <input type="text" name="num" class="ticket_number_input" style="float:left;" data-target="@x.ID" value="@(ViewBag.num==null?0:ViewBag.num)" maxlength="3" min="1" />
+                <span class="ticket_number_increase glyphicon-plus glyphicon" style="float:left;"></span>
+                <img src="~/Content/default/images/delete.png" class="delete" />
+            </div>
+        </div>
+    }
+
+    <div class="count">
+        实付款：<span id="allPrice"></span>
+    </div>
+
+    <div class="pay_text">支付方式</div>
+    <div class="pay">
+        <input type="radio" name="paytype" value="alipay" checked />
+        <img src="~/Content/default/images/alipay.png" width="53" height="26" style="margin-top:-3px;" />
+    </div>
+
+    <button class="ticket_buy_button btn-groupbuy" onclick="toBuy(); return false;">确认购买</button>
+
+    @*<a name="myTickets"><div class="ticket_record"> 查询门票记录</div></a>*@
+</div>
+
+<script>
+    $(function () {
+        sunPrice();
+    })
+    //算总账
+    function sunPrice() {
+        var all = 0;
+        $(".allprice").each(function () {
+            all += Number($(this).attr("data-price"));
+        })
+        $("#allPrice").text("￥" + all.toFixed(2));
+    }
+    //确认购买
+    $(".btn-groupbuy").click(function () {
+        var ids = "";
+        var nums = "";
+        var mobile = @ViewBag.Mobile
+
+        $("input[name='num']").each(function (i, item) {
+            var number = $(this).val();
+            if (id != "") {
+                var id = $(this).attr("data-target");
+                if (ids == "") {
+                    ids = id;
+                    nums = number;
+                }
+                else {
+                    ids += ("," + id);
+                    nums += ("," + number);
+                }
+            }
+        })
+        if (ids != "") {
+            $.post("@Url.Action("AddOrder")", { ids: ids, nums: nums, mobile: mobile }, function (data) {
+                if (data.Successed) {
+                    //成功
+                    window.location.href = "/MobilePay/" + $('input[name=paytype]:checked').val() + "?no=" + data.Code;
+                }
+                else {
+                    alert(data.Message);
+                }
+            }, "json");
+        }
+
+    })
+    //删除
+    $(".delete").click(function () {
+        if (confirm("确定删除这张票吗？")) {
+            var tr = $(this).parent().parent();
+            tr.remove();
+            sunPrice();
+        }
+    })
+
+</script>
+
+<script>
+    $("input[name=num]").keyup(function () {
+        var value = $(this).val();
+        try {
+            value = value.replace(/\D/g, '');
+            $(this).val(Number(value));
+        }
+        catch (e) {
+            $(this).val(1);
+        }
+
+        $target = $(".allprice[data-target=" + $(this).attr("data-target") + "]");
+        $target.text("￥" + (Number($(this).val()) * Number($target.attr("data-singleprice"))).toFixed(2));
+        $target.attr("data-price", (Number($(this).val()) * Number($target.attr("data-singleprice"))).toFixed(2));
+        sunPrice();
+    });
+    $(".ticket_number_decrease").click(function () {
+        var value = $(this).parent().find("input[name='num']").val();
+        try {
+            value = value.replace(/\D/g, '');
+            value = Number(value) - 1;
+        }
+        catch (e) {
+            value = 1;
+        }
+        if (value < 0)
+            value = 0;
+        $(this).parent().find("input[name='num']").val(value);
+
+        $input = $(this).parent().find("input[name='num']");
+        $target = $(".allprice[data-target=" + $input.attr("data-target") + "]");
+
+        $target.attr("data-price", (Number($input.val()) * Number($target.attr("data-singleprice"))).toFixed(2));
+        $target.text("￥" + (Number($input.val()) * Number($target.attr("data-singleprice"))).toFixed(2));
+        sunPrice();
+    });
+    $(".ticket_number_increase").click(function () {
+        var value = $(this).parent().find("input[name='num']").val();
+        try {
+            value = value.replace(/\D/g, '');
+            value = Number(value) + 1;
+        }
+        catch (e) {
+            value = 1;
+        }
+        $(this).parent().find("input[name='num']").val(value);
+
+        $input = $(this).parent().find("input[name='num']");
+        $target = $(".allprice[data-target=" + $input.attr("data-target") + "]");
+
+        $target.attr("data-price", (Number($input.val()) * Number($target.attr("data-singleprice"))).toFixed(2));
+        $target.text("￥" + (Number($input.val()) * Number($target.attr("data-singleprice"))).toFixed(2));
+        sunPrice();
+    });
+</script>

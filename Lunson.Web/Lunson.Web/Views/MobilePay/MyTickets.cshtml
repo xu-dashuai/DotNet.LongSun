@@ -1,0 +1,225 @@
+﻿@model IQueryable<Lunson.Domain.Entities.TicketDetail>
+
+@{
+    ViewBag.Title = "我的门票";
+    Layout = "~/Views/Shared/_LayoutMobile.cshtml";
+
+    var ticketNos = Model.Select(t => t.TicketNO);
+    var count = ticketNos.Count();
+    var bigQC_Contain = 10; //每个组合二维码包含票的张数
+    var bigQC_Num = count / bigQC_Contain + 1; //组合二维码的个数
+    string bigQC_Nos = null;
+    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+    var usedTickets = ViewBag.UsedTickets as IQueryable<Lunson.Domain.Entities.TicketDetail>;
+}
+
+<div class="goToBuy"><a href="@Url.Action("Index")">去购票</a></div>
+
+<div class="all">
+    <div class="theme col-xs-7 col-xs-offset-3 col-sm-4 col-md-3 col-md-offset-5 row">
+        <div class="col-xs-11 col-xs-offset-1">
+            <img src="~/Content/default/images/right.png" width="35" height="35" style="float:left;margin-right:10px;" />
+            <div style="margin-left:30px;">购买成功</div>
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    @if (Model.Any())
+    {
+        <div class="tip">
+            <p>以下是你本次购买有效票的组合二维码</p>
+            <p>凭此二维码可一次使用本次购买的所有有效票</p>
+            <p style="color: #ff7700">（若自定义组合使用后，请手动刷新页面）</p>
+        </div>
+        <div class="qrcode combo-qrcode">
+            @if (Model.Count() > bigQC_Contain)
+            {
+                var y = 1;
+                <p>（此处每个组合二维码里包含最多 @bigQC_Contain 张票）</p>
+                for (int i = 0; i < count; i += bigQC_Contain)
+                {
+                    foreach (var x in ticketNos.Skip(i).Take(bigQC_Contain).ToList())
+                    {
+                        sb.AppendFormat("{0},", x);
+                    }
+                    bigQC_Nos = sb.ToString();
+                    <a href="#" data-toggle="modal" data-target="#@i"><img src="@Url.Action("QR")?id=@bigQC_Nos" /></a>
+                <!-- Modal -->
+                    <div class="modal fade" id="@i" role="dialog">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <img src="@Url.Action("QR")?id=@bigQC_Nos" style="width: 100%; height: 100%" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="color: #ff7700; ">组合二维码 @y</p>
+                    y++;
+                }
+            }
+            else
+            {
+                foreach (var x in ticketNos.ToList())
+                {
+                    sb.AppendFormat("{0},", x);
+                }
+                bigQC_Nos = sb.ToString();
+                <a href="#" data-toggle="modal" data-target="#@bigQC_Nos"><img src="@Url.Action("QR")?id=@bigQC_Nos" /></a>
+            <!-- Modal -->
+                <div class="modal fade" id="@bigQC_Nos" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                <img src="@Url.Action("QR")?id=@bigQC_Nos" style="width: 100%; height: 100%" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p style="color: #ff7700">组合二维码</p>
+            }
+        </div>
+    }
+
+    <div class="detail">
+        <div class="tip">
+            <p style="font-size:0.825em;">门票详情：<span>(点击展开二维码以单独使用)</span></p>
+        </div>
+        <ul>
+            @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <li>
+                        <div class="panel-heading" role="tab">
+                            <h4 class="panel-title" style="border:1px solid #d3d3d3;margin-bottom:10px;padding:5px;">
+                                <label>
+                                    <input type="checkbox" data-no="@item.TicketNO" style="float:left; margin-right: 10px; margin-top: 8px; zoom: 1.5" />
+                                    <ul style="float:left;">
+                                        <li style="color: #b9cc4c;font-size:1em;margin:6px 0;">@item.Name</li>
+                                        <li style="text-align: left; color: #8c8a8a;font-size:0.75em; margin: 6px 0;">票号：@item.TicketNO</li>
+                                    </ul>
+                                </label>
+
+                                <a data-toggle="collapse" href="#@item.ID" style="float:right;line-height: 55px;">
+                                    <span>+展开</span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div class="panel-collapse collapse" id="@item.ID" role="tabpanel" aria-labelledby="headingTwo">
+                            <div class="panel-body qrcode">
+                                <a href="#" data-toggle="modal" data-target="#@item.TicketNO"><img src="@Url.Action("QR")?id=@item.TicketNO" /></a>
+                                <!-- Modal -->
+                                <div class="modal fade" id="@item.TicketNO" role="dialog">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-body">
+                                                <img src="@Url.Action("QR")?id=@item.TicketNO" style="width: 100%; height: 100%" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                }
+            }
+            @if (usedTickets.Any())
+            {
+                foreach (var item in usedTickets)
+                {
+                    <li>
+                        <div class="panel-heading" role="tab">
+                            <h4 class="panel-title" style="border:1px solid #d3d3d3;margin-bottom:10px;padding:5px;">
+                                <label>
+                                    <ul style="float:left;">
+                                        <li style="color: #bebebe; font-size: 1em; margin: 6px 0;">@item.Name</li>
+                                        <li style="text-align: left; color: #bebebe; font-size: 0.75em; margin: 6px 0;">票号：@item.TicketNO</li>
+                                    </ul>
+                                </label>
+                                <a data-toggle="collapse" style="float: right; line-height: 55px; color: #bebebe">
+                                    <span>已使用</span>
+                                </a>
+                            </h4>
+                        </div>
+                    </li>
+                }
+            }
+        </ul>
+
+    </div>
+</div>
+
+<div style="position: fixed; bottom: 0; left: 0; z-index: 99; height: 40px; width: 100%; line-height:40px; background-color: #b1c639; color: white;">
+    <div class="all" style="padding: 0 10px;">
+        <label>
+            <input type="checkbox" style="zoom: 1.5;display:inline;vertical-align: text-bottom;margin-left: 3px;" id="selectAll" /> 全选
+        </label>
+        <input style="display: inline; float: right; height: 40px; width: 70%; border: none; background-color: #ff7700" type="button" onclick="openNewDiv(); return false;" value="生成组合二维码" />
+    </div>
+</div>
+
+<div class="modal fade" id="win" role="dialog">
+    <div class="modal-dialog many" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="num"></span> 张鳄鱼园门票</h4>
+            </div>
+            <div class="modal-body">
+                <img style="width: 100%; height: 100%" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    //图片弹出遮罩
+    $(function () {
+        minWidth = Math.min(window.innerHeight, window.innerWidth);
+        $('.modal-dialog').css('height', minWidth).css('width', minWidth).css('margin', '0 auto');
+
+        $("#selectAll").change(function () {
+            var chk = $(this).is(":checked");
+            $("li input[type='checkbox']").each(function (i, item) {
+                var itemchk = $(item).is(":checked");
+                if (chk != itemchk)
+                    $(item).click();
+            })
+        })
+    })
+
+    function getAllTicket() {
+        var allTicket = "";
+        $("li input[type='checkbox']").each(function (i, item) {
+            var isTrue = $(item).is(":checked");
+            if (isTrue) {
+                var no = $(item).attr("data-No");
+                if (allTicket == "") {
+                    allTicket = no;
+                }
+                else {
+                    allTicket += ("," + no);
+                }
+            }
+        })
+        return allTicket;
+    }
+    function openNewDiv() {
+        var ticket = getAllTicket();
+        var ticketNum = ticket.split(',').length;
+        if (ticket == "" || ticketNum < 2) {
+            alert("请至少选择两张票，以生成组合二维码！");
+            return false;
+        }
+        if (ticketNum > 10) {
+            alert("组合生成二维码一次最多支持 10 张，您选的太多了！（" + ticketNum + "张）");
+            return false;
+        }
+        $("#win").find("img").attr('src', '@Url.Action("QR")?id=' + ticket);
+        $("#win").find(".num").text(ticket.split(',').length);
+        $('#win').modal('toggle')
+    }
+</script>

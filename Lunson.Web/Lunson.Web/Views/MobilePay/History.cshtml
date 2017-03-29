@@ -1,0 +1,214 @@
+﻿@model IQueryable<Lunson.Domain.Entities.TicketDetail>
+@{
+    ViewBag.Title = "History";
+    Layout = "~/Views/Shared/_LayoutMobile.cshtml";
+}
+
+<div class="goToBuy"><a href="@Url.Action("Index")">去购票</a></div>
+
+<div class="all">
+    <div style="margin-left:0;margin-right:0;">
+        <ul id="history">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <li class="item">
+                        @if (item.IsUsed == Lunson.Domain.YesOrNo.No)
+                        {
+                            <div class="qcode">
+                                @*<a class="test-popup-link" href="@Url.Action("QR")?id=@item.TicketNO"><img src="@Url.Action("QR")?id=@item.TicketNO" width="105" height="105" /></a>*@
+                                <a href="#" data-toggle="modal" data-target="#@item.TicketNO"><img src="@Url.Action("QR")?id=@item.TicketNO" width="105" height="105" /></a>
+                                <!-- Modal -->
+                                <div class="modal fade" id="@item.TicketNO" role="dialog">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-body">
+                                                <img src="@Url.Action("QR")?id=@item.TicketNO" style="width: 100%; height: 100%" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <label style="display: inline">
+                                <input type="checkbox" data-no="@item.TicketNO" style="float:left; margin-right: 10px; margin-top: 8px; zoom: 1.5" />
+                                <ul style="float: left;">
+                                    <li class="name">@item.Name</li>
+                                    <li class="number">票号：@item.TicketNO</li>
+                                    <li class="unused">未使用</li>
+                                </ul>
+                            </label>
+                        }
+                        else
+                        {
+                            <p class="name">@item.Name</p>
+                            <p class="number">票号：@item.TicketNO</p>
+                            <p class="used">使用时间：@(item.UsedTime.ToString("yyyy年M月d日 h:m:ss"))</p>
+                        }
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+
+    <form class="form-horizontal myform" name="identity" method="post" style="margin-top:20px;">
+        <div class="form-group" style="margin-left:0;margin-right:0;">
+            <input class="form-control input" name="mobile" value="@Request.QueryString["mobile"]" placeholder="手机号" />
+        </div>
+        <div class="form-group" style="margin-left:0;margin-right:0;">
+            <input class="form-control input lite" name="code" value="@Request.QueryString["code"]" placeholder="验证码" />
+            <input class="verification_code" type="button" name="sendCheckCode" onclick="getCode()" value="获取验证码" />
+        </div>
+        <div class="form-group" style="margin-left:0;margin-right:0;">
+            <input class="ticket_buy_button" type="button" onclick="search()" value="查询" />
+        </div>
+    </form>
+</div>
+
+<div style="position: fixed; bottom: 0; left: 0; z-index: 99; height: 40px; width: 100%; line-height:40px; background-color: #b1c639; color: white;">
+    <div class="all" style="padding: 0 10px;">
+        <label>
+            <input type="checkbox" style="zoom: 1.5;display:inline;vertical-align: text-bottom;" id="selectAll" /> 全选
+        </label>
+        <input style="display: inline; float: right; height: 40px; width: 70%; border: none; background-color: #ff7700" type="button" onclick="openNewDiv(); return false;" value="生成组合二维码" />
+    </div>
+</div>
+<div class="modal fade" id="win" role="dialog">
+    <div class="modal-dialog many" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="num"></span> 张鳄鱼园门票</h4>
+            </div>
+            <div class="modal-body">
+                <img style="width: 100%; height: 100%" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var y;
+
+    function getCode() {
+        var mobile = $("input[name='mobile']").val();
+        if (checkInput()) {
+            ///发送验证码
+            $.post("@Url.Action("SendMobileCode", "Account")", { mobile: mobile }, function (result) {
+                if (result.success == true) {
+                    $("input[name='sendCheckCode']").addClass("disabled");
+                    $("input[name='sendCheckCode']").attr("onclick", "");
+
+                    y = self.setInterval(djs, 1000);
+                }
+                else {
+                    alert(result.msg);
+                }
+            })
+        }
+    }
+
+    var j = 0;
+    function djs() {
+
+        time = 60 - j;
+        if (time <= 0) {
+            clearInterval(y);
+            $("input[name='sendCheckCode']").removeClass("disabled").val("获取验证码");
+            $("input[name='sendCheckCode']").attr("onclick", "getCode()");
+
+            j = 0;
+        }
+        else {
+            $("input[name='sendCheckCode']").val(time + " 秒重置");
+            j++;
+        }
+
+    }
+
+    function search() {
+        var mobile = $("input[name='mobile']").val();
+        var code = $("input[name='code']").val();
+
+        if (checkInput()) {
+            if (code == undefined || code == "") {
+                alert("请输入验证码");
+            }
+            else {
+                ///submit查询
+                $.post("@Url.Action("CheckCode")", { mobile: mobile, code: code }, function (result) {
+                    if (result.match == false) {
+                        alert(result.msg);
+                    }
+                    else {
+                        $("form").submit();
+                    }
+                });
+            }
+        }
+    }
+
+    //检查手机输入
+    function checkInput() {
+        var mobile = $("input[name='mobile']").val();
+        var reg = /^1[3|5|7|8]\d{9}$/;
+
+        if (mobile == undefined || mobile == "") {
+            alert("请输入您的手机号");
+            return false;
+        }
+        else {
+            if (reg.test(mobile) == false) {
+                alert("手机格式不正确");
+                return false;
+            }
+            return true;
+        }
+    }
+
+    $(function () {
+        minWidth = Math.min(window.innerHeight, window.innerWidth);
+        $('.modal-dialog').css('height', minWidth).css('width', minWidth).css('margin', '0 auto');
+
+        $("#selectAll").change(function () {
+            var chk = $(this).is(":checked");
+            $("li input[type='checkbox']").each(function (i, item) {
+                var itemchk = $(item).is(":checked");
+                if (chk != itemchk)
+                    $(item).click();
+            })
+        })
+    })
+
+    function getAllTicket() {
+        var allTicket = "";
+        $("li input[type='checkbox']").each(function (i, item) {
+            var isTrue = $(item).is(":checked");
+            if (isTrue) {
+                var no = $(item).attr("data-No");
+                if (allTicket == "") {
+                    allTicket = no;
+                }
+                else {
+                    allTicket += ("," + no);
+                }
+            }
+        })
+        return allTicket;
+    }
+    function openNewDiv() {
+        var ticket = getAllTicket();
+        var ticketNum = ticket.split(',').length;
+        if (ticket == "" || ticketNum < 2) {
+            alert("请至少选择两张票，以生成组合二维码！");
+            return false;
+        }
+        if (ticketNum > 10) {
+            alert("组合生成二维码一次最多支持 10 张，您选的太多了！（" + ticketNum + "张）");
+            return false;
+        }
+        $("#win").find("img").attr('src', '@Url.Action("QR")?id=' + ticket);
+        $("#win").find(".num").text(ticket.split(',').length);
+        $('#win').modal('toggle')
+    }
+</script>

@@ -1,0 +1,114 @@
+﻿@model List<Lunson.Domain.Entities.TradeLog>
+@{
+    ViewBag.Title = "交易记录";
+}
+
+<style type="text/css">
+
+.tablebox{margin:0 auto}
+
+.trade-line                 {position: absolute;background-color: #b3ca94;width: 6px;left: 50%;margin-left: -3px;top: 0;bottom: 0;}
+.trade-line i.trade-time    {position: absolute;background-image: url(/Content/images/time.png);width: 55px;height: 55px;margin-left: -26px;}
+.trade-line i.trade-bigtime {position: absolute;background-image: url(/Content/images/bigtime.png);width: 24px;height: 24px;margin-left: -9px;bottom: 0;}
+i.trade-smalltime {position: absolute;background-image: url(/Content/images/smalltime.png);left: 608px;width: 13px;height: 13px;z-index: 100;margin-top: 42px;}
+
+li.tradebox {padding-top: 20px;line-height: 25px;min-height: 100px;}
+.trade-left {position: relative;float: left;width: 570px;color: #52611e;font-size: 14px;}
+.trade-left-text {text-align: right;color: #b3ca94;line-height: 100px;} /*青绿日期*/ 
+
+.trade-right {position: relative;float: left;margin-left: 90px;color: #52611e;width: 570px;font-size: 14px;}
+.trade-right-text {text-align: left;color: #b3ca94;line-height: 100px;}
+.trade-smalltime-img {width: 10px;height: 10px;float: left;margin-top: 34px;}
+.trade-conment {width: 540px;background-color: #b3ca94;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;float: left;padding-top: 10px;padding-left: 15px;padding-right: 5px;padding-bottom: 10px;}
+.trade-conment-unfold {width: 540px;background-color: #b3ca94;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;float: left;padding-top: 10px;padding-left: 15px;padding-right: 5px;padding-bottom: 10px;}
+.more {color: #566d39;margin: auto;width: 14px;height: 6px;margin-top: 5px;}
+.trade-conment a:hover {color: #000;}
+.tradetable {margin: auto;border-top: 1px solid #566d39;border-left: 1px solid #566d39;text-align: center;margin-top: 20px;}
+.tradetable tr {border-bottom: 1px solid #566d39;}
+.tradetable td {border-right: 1px solid #566d39;border-bottom: 1px solid #566d39;}
+.tradetext {float: left;font-size: 16px;color: #7f9069;}
+.tradenav {float: left;font-size: 14px;}
+ul.tradenav li {float: left;display: list-item;margin-left: 10px;color: #6a7e50;cursor:pointer}
+ul.tradenav li a {color: #6a7e50;}
+.tradenav li.active {border-bottom: solid 4px #b3ca94;color: #6a7e50;}
+
+</style>
+
+<div class="tablebox" style="position:relative;height:500px; width:1230px;">
+
+    <div class="trade-line">
+        <i class="trade-time"></i>
+        <i class="trade-bigtime"></i>
+    </div>
+    <div>
+        <ul class="tradenav">
+            <li class="active" onclick="$.post('@Url.Action("Tradelog","Account")') ">全部记录</li>
+            <li class="" onclick="$.post('@Url.Action("Tradelog","Account")?sort=buy') ">购票记录</a></li>
+            <li class="" onclick="$.post('@Url.Action("Tradelog","Account")?sort=refund') ">退票记录</a></li>
+        </ul>
+    </div>
+    <ul style="padding-top:56px;">
+        @if (Model.Count > 0)
+        {
+            var p = 0;
+            <li class="tradebox">
+                <div class="trade-left trade-left-text">
+                    @Convert.ToDateTime(Model.ElementAt(0).CreatedOn).ToString("yyyy.M.d")
+                    <i class="trade-smalltime"></i>
+                </div>
+                <div class="trade-right">
+                    <div class="trade-smalltime-img"><img src="~/Content/images/trade.png"></div>
+                    <div class="trade-conment-unfold">
+                        <span>
+                            @Model.ElementAt(0).Message
+                        </span>
+                        <div class="tucking" style="display:none">@Html.Raw(Model.ElementAt(0).Content)</div>
+                        <div class="more"><a href="#" class="more"><img src="~/Content/images/uofold-up.png"></a></div>
+                    </div>
+                    </div>
+            </li>
+            for (int i = 1; i < Model.Count; i++)
+            {
+                <li class="tradebox">
+                    <div class="trade-left">
+                        <div class="trade-conment">
+                            <span>
+                                @Model.ElementAt(i).Message
+                            </span>
+                            <div class="tucking" style="display:none">@Html.Raw(Model.ElementAt(i).Content)</div>
+                            <div class="more"><a href="#" class="more"><img src="~/Content/images/uofold-up.png"></a></div>
+                        </div>
+                        <div class="trade-smalltime-img"><img src="~/Content/images/tradeL.png"></div>
+                        <i class="trade-smalltime"></i>
+                    </div>
+                    <div class="trade-right trade-right-text">
+                        @Convert.ToDateTime(Model.ElementAt(i).CreatedOn).ToString("yyyy.M.d")
+                    </div>
+                </li>
+                //while (Model.ElementAt(i).CreatedOn.ToString().Split(' ')[0] != Model.ElementAt(i - 1).CreatedOn.ToString().Split(' ')[0])
+                //{
+
+                //}
+            }
+        }
+    </ul>
+    <div class="trade-buy"></div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("ul.tradenav li").click(function () {
+            if ($(this).hasClass("active")) {
+                return;
+            }
+            $("ul.tradenav li").removeClass("active");
+            $(this).addClass("active");
+
+        })
+
+
+        $(".more").click(function () {
+            $(this).prev(".tucking").slideToggle("slow");
+        })
+    })
+</script>

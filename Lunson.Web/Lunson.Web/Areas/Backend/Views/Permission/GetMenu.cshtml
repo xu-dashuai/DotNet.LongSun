@@ -1,0 +1,62 @@
+﻿@model Lunson.Domain.Entities.Sys_Menu
+
+<table id="dg"></table>
+
+<div id="toolbar">
+    <a class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="openFormDlg()">添加</a>
+</div>
+
+<script>
+    $(function () {
+        $dg = $("#dg");
+
+        $dg.datagrid({
+            url: '@Url.Action("GetMenuPermissions")?id=@Model.ID',
+            fit: true,
+            border: false,
+            toolbar: '#toolbar',
+            rownumbers: true,
+            singleSelect: true,
+            columns: [[
+                { field: 'Name', title: '权限名称', width: 120 },
+                { field: 'Code', title: '权限代码', width: 120 },
+                { field: 'Regex', title: '权限正则', width: 220 },
+                { title: '操作', field: 'Editor', width: 100, align: 'center', formatter: opFormat }
+            ]]
+        });
+    })
+
+    function opFormat(value, row) {
+        var html = "";
+        html += "<a href=\"javascript:void(0)\" onclick=\"openFormDlg('" + row.ID + "')\">编辑</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+        html += "<a href=\"javascript:void(0)\" onclick=\"deleteData('" + row.ID + "')\">删除</a>";
+        return html;
+    }
+
+    function openFormDlg(id) {
+        if (!id)
+            id = "";
+
+        pharos.easyui.dialog.topOpen("editPermission", {
+            width: 700,
+            height: 400,
+            resizable: false,
+            modal: true,
+            title: '权限编辑',
+            href: '@Url.Action("EditPermission")?menuid=@Model.ID&&id=' + id,
+            buttons: [{
+                text: '保存', iconCls: 'icon-save', handler: function () {
+                    window.top.$('#editPermission form').submit();
+                }
+            }]
+        });
+    }
+
+    function deleteData(id) {
+        pharos.easyui.confirm("确认", "确认删除么？", function () {
+            $.post("@Url.Action("RemovePermission")/" + id, function () {
+                $("#dg").datagrid("reload");
+            })
+        });
+    }
+</script>

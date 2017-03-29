@@ -1,0 +1,55 @@
+﻿@model Lunson.Domain.Entities.Order
+@{
+    ViewBag.Title = "购买成功"; 
+    Layout = "~/Views/Shared/_LayoutUserInfo.cshtml";
+}
+
+<style>
+  td{text-align:center; color: gray; font-size: 1.2em; }
+</style>
+
+<div class="w1000 ticketlist">
+    <div class="wrap">
+        <p class="nav">
+            <img src="~/Content/images/success.png" />
+        </p>
+        <p style="text-align:center;margin:50px 0;font-size:2em;color:gray;">
+            <img src="~/Content/images/right.png" style="vertical-align:middle;margin-right:20px;" /><span>您已成功购买门票！<a href="@Url.Action("Index","BookLet")">去拍照门票二维码>></a></span>
+        </p>
+        <p class="message" style="color:gray;text-align:center;">&nbsp;</p>
+
+        <table style="border:solid 1px #efefef;width:100%;padding:10px;">
+            <tr>
+                <td width="330" rowspan="2">
+                    门票明细：
+                    @foreach (var item in Model.OrderDetails)
+                    {
+                        @item.Name  @:共 @item.Num 张<br/>
+                    }
+                </td>
+                <td width="">付款金额：￥@Model.AllPrice</td>
+                <td width="330">客服电话：0592-6068699</td>
+            </tr>
+            <tr>
+                <td>订单号：@Model.OrderNo</td>
+                <td>交易单号：@Model.TradeNo</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var i = 10;
+
+    $(function () {
+        setInterval(setTime, 1000);
+    })
+
+    function setTime() {
+        if (i == 0) {
+            window.location = '@Url.Action("Index","BookLet")';
+        }
+        $(".message").text(i + "秒后自动跳转到 我的票夹");
+        i--;
+    }
+</script>

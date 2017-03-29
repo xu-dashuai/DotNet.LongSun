@@ -1,0 +1,107 @@
+﻿@{
+    ViewBag.Title = "忘记密码";
+}
+
+@using (Html.BeginForm())
+{
+    <div class="loginwrap">
+        <h1>重置密码</h1>
+        <p class="msg">
+            <label>手机号</label><input type="text" id="mobile" name="mobile" />
+        </p>
+        <p class="btn">
+            <a class="btn-register" id="sendCheckCode" name="sendCheckCode" onclick="sendCode(this)">发送验证码</a>
+        </p>
+        <p class="msg">
+            <label>验证码</label><input type="text" id="code" name="code" />
+        </p>
+        <p class="msg">
+            <label>新密码</label><input type="password" id="newPwd" name="newPwd" />
+        </p>
+        <p class="msg">
+            <label>重输密码</label><input type="password" id="confirmPwd" name="confirmPwd" />
+        </p>
+        <p>
+            <a class="btn-login" id="reset" name="reset">重置</a>
+        </p>
+        <p style="color:red">*为安全起见，手机购票用户初次登录需重置密码</p>
+    </div>
+}
+
+<script type="text/javascript">
+    var y;
+
+    function sendCode(e) {
+        if ($(e).hasClass("disabled"))
+            return;
+
+        $.post('@Url.Action("SendMobileCode")', { mobile: $("input[name=mobile]").val() }, function (data) {
+            if (data.success == true) {
+                $("#sendCheckCode").addClass("disabled");
+                y = self.setInterval(djs, 1000);
+            }
+            else {
+                alert(data.msg);
+            }
+        });
+    }
+
+    var j = 0;
+    function djs() {
+
+        time = 120 - j;
+        if (time <= 0) {
+            clearInterval(y);
+            $("#sendCheckCode").removeClass("disabled").text("获取手机验证码");
+            j = 0;
+        }
+        else{
+            $("#sendCheckCode").text("（"+time + "）秒");
+            j++;
+        }
+
+    }
+
+
+    $("a#reset").click(function () {
+        $.post('@Url.Action("ResetPassword")', $("form").serialize(), function (data) {
+            if (data.success) {
+                alert("重置密码成功，请登录");
+            }
+            else {
+                alert(data.message);
+            }
+        });
+    })
+</script>
+
+@{
+    if (Session["SendTime"] != null && Session["SendTime"].ToString() != "")
+    {
+        var stime = Convert.ToDateTime(Session["SendTime"]);
+        var mtime = (int)(DateTime.Now - stime).TotalSeconds;
+        if (stime != null && mtime < 120)
+        {
+            <script>
+                $("#sendCheckCode").addClass("disabled");
+
+                var mtime = @mtime;
+                var i = 1;
+                var time = 0;
+                var x = self.setInterval(cd, 1000);
+
+                function cd() {
+                    time = (120 - mtime) - i;
+                    if(time <= 0){
+                        clearInterval(x);
+                        $("#sendCheckCode").removeClass("disabled").text("发送验证码");
+                    }
+                    else{
+                        $("#sendCheckCode").text("（"+time + "）秒");
+                    }
+                    i++;
+                }
+            </script>
+        }
+    }
+}

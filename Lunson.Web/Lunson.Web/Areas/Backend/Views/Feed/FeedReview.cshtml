@@ -1,0 +1,117 @@
+﻿
+<table id="dg"></table>
+
+<script type="text/javascript">
+    $feed = $("#dg");
+
+    $(function () {
+        $feed.datagrid({
+            url: '@Url.Action("GetFeeds")',
+            rownumbers: true,
+            fit: true,
+            fitColumns: true,
+            border: false,
+            singleSelect: true,
+            pagination: true,
+            pageSize: 20,
+            columns: [[
+                { field: 'Title', title: '标题', width: 200, halign: 'center' },
+                { field: 'FeedTypeName', title: '类型', width: 100, align: 'center' },
+                { field: 'Author', title: '作者', width: 100, align: 'center' },
+                { field: 'Original', title: '文章来源', width: 100, align: 'center' },
+                {
+                    field: 'PublishOn', title: '发布日期', width: 100, align: 'center'
+                },
+                {
+                    field: 'IsRecommend', title: '是否推荐', width: 60, align: 'center', formatter: function (value, row) {
+                        return "<input type=\"checkbox\"" + (value == 1 ? "checked" : null) + " onclick=\"UpdateIsRecommend('" + row.ID + "','" + value + "')\") />";
+                        //if (value == 1) return '推荐'; else return '不推荐';
+                    },
+                    //editor: { type: 'checkbox', options: { on: '1', off: '0' } }
+                },
+                {
+                    field: 'IsTop', title: '是否置顶', width: 60, align: 'center', formatter: function (value, row) {
+                        return "<input type=\"checkbox\"" + (value == 1 ? "checked" : null) + " onclick=\"UpdateIsTop('" + row.ID + "','" + value + "')\") />";
+                    }
+                },
+                {
+                    field: 'ActiveState', title: '审核通过', width: 60, align: 'center', formatter: function (value, row) {
+                        return "<input type=\"checkbox\"" + (value == 0 ? "checked" : null) + " onclick=\"UpdateCheck('" + row.ID + "','" + value + "')\") />";
+                    }
+                },
+                { field: 'Editor', title: '管理', width: 100, align: 'center', formatter: opFormat }
+            ]]
+        });
+
+
+    })
+
+    //IE 8 无法兼容 new Date,所以去除此步js日期格式化
+    //
+    //function changeFormat(value) {
+    //    if (value != null) {
+    //        return new Date(value).format("yyyy-MM-dd hh:mm:ss");
+    //    }
+    //    else {
+    //        return null;
+    //    }
+    //}
+
+    function opFormat(value, row) {
+        var html = "";
+        html += "<a href=\"javascript:void(0)\" onclick=\"openFormDlg('" + row.ID + "')\">编辑</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+        html += "<a href=\"javascript:void(0)\" onclick=\"removefeed('" + row.ID + "')\">删除</a>";
+        return html;
+    }
+    function removefeed(id) {
+        $.messager.defaults = { ok: "确定", cancel: "取消" };
+        pharos.easyui.confirm("确认", "确认删除么？", function () {
+            $.post("@Url.Action("RemoveFeed")/" + id, function () {
+                $feed.datagrid("reload");
+            })
+        });
+    }
+    function openFormDlg(id) {
+        var popID = "feed";
+        var formTitle;
+        if (!id) { formTitle = "添加文章"; id = null }
+        else { formTitle = "编辑文章" }
+
+        pharos.easyui.dialog.topOpen(popID, {
+            width: 900,
+            height: 600,
+            modal: true,
+            title: formTitle,
+            content: '<iframe id="feediframe" scrolling="auto" frameborder="0" src="@Url.Action("FeedManageForm")?id=' + id + '" style="width:100%;height:99%;"></iframe>',
+            buttons: [{
+                text: '保存',
+                iconCls: 'icon-save',
+                handler: function () { window.top.$("body").data("feedForm")("#feedManageForm").submit(); }
+            }]
+        })
+    }
+
+
+    function UpdateIsRecommend(id, value) {
+        $.post("@Url.Action("UpdateIsRecommend")",
+        { id: id, oldValue: value },
+        function () {
+            $("#dg").datagrid("reload");
+        });
+    }
+    function UpdateIsTop(id, value) {
+        $.post("@Url.Action("UpdateIsTop")",
+        { id: id, oldValue: value },
+        function () {
+            $("#dg").datagrid("reload");
+        });
+    }
+    function UpdateCheck(id, value) {
+        $.post("@Url.Action("UpdateCheck")",
+        { id: id, oldValue: value },
+        function () {
+            $("#dg").datagrid("reload");
+        });
+    }
+
+</script>

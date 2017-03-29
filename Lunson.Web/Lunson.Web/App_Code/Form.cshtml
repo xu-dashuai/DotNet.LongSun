@@ -1,0 +1,114 @@
+﻿@helper Item(string label, string inputtype, string name, string msg = "", object defaultvalue = null, bool isdisable = false)
+{
+    switch (inputtype)
+    {
+        case "password":
+        case "text":
+            <div class="clearfix">
+                <label>@label</label>
+                <div>
+                    <input type="@inputtype" class="input-text" name="@name" value="@defaultvalue" @(isdisable ? "disabled" : "") />
+                    <span class="msg">@msg</span>
+                </div>
+            </div>
+            break;
+        case "number":
+        <div class="clearfix">
+            <label>@label</label>
+            <div>
+                <input type="text" class="input-text" name="@name" value="@defaultvalue" @(isdisable ? "disabled" : "") onchange="$(this).val(pharos.regex.number($(this).val()));" />
+                <span class="msg">@msg</span>
+            </div>
+        </div>
+            break;
+        case "textarea":
+        <div class="clearfix">
+            <label>@label</label>
+            <div>
+                <textarea class="input-textarea" name="@name" @(isdisable ? "disabled" : "")>@defaultvalue</textarea>
+                <span class="msg">@msg</span>
+            </div>
+        </div>
+            break;
+    }
+}
+
+
+@helper Radio(string label, List<Pharos.Framework.DropdownItem> dropdowList, string name, string msg = "")
+{
+    <div class="clearfix">
+        <label>@label</label>
+        <div>
+            @foreach (var x in dropdowList)
+            {
+                <input type="radio" name="@name" value="@x.Value" class="input-radio" @(x.IsSelected ? "checked" : "") /> @x.Text
+            }
+            <span class="msg">@msg</span>
+        </div>
+    </div>
+}
+
+@helper CheckBox(string label, List<Pharos.Framework.DropdownItem> dropdowList, string name, string msg = "")
+{
+    <div class="clearfix">
+        <label>@label</label>
+        <div>
+            @foreach (var x in dropdowList)
+            {
+                <input type="checkbox" name="@name" value="@x.Value" class="input-radio" @(x.IsSelected ? "checked" : "") /> @x.Text
+            }
+            <span class="msg">@msg</span>
+        </div>
+    </div>
+}
+
+@helper Select(string label, List<Pharos.Framework.DropdownItem> dropdowList, string name, string msg = "")
+{
+    var obj = dropdowList.FirstOrDefault(a => a.IsSelected == true);
+    var value = obj == null ? "" : obj.Value;
+    var text = obj == null ? "请选择" : obj.Text;
+    var id = "_" + Guid.NewGuid().ToString("N").Substring(0, 5);
+    <div class="clearfix">
+        <label>@label</label>
+        <input type="hidden" name="@name" value="@value" />
+        <div>
+            <div class="select" id="@id">
+                <span>@text</span>
+                <ul style="display:none;">
+                    @foreach (var x in dropdowList)
+                    {
+                        <li><a href="javascript:;" data-v="@x.Value" class="@(x.Value==value?"active":"")">@x.Text</a></li>
+                    }
+                </ul>
+            </div>
+            <span class="msg">@msg</span>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $@(id) = $("#@id");
+            $@(id).click(function () {
+                $@(id).find("ul").show();
+            });
+
+            @*$(document).bind("click", function (e) {
+                var target = $(e.target);
+                if (target.attr("id")!='@id') {
+                    $select.find("ul").hide();
+                }
+            })*@
+
+            $@(id).mouseleave(function () {
+                $@(id).find("ul").hide();
+            });
+
+            $@(id).find("li a").click(function () {
+                $@(id).find("li a").removeClass("active");
+                $(this).addClass("active");
+                $@(id).find("span").text($(this).text());
+                $@(id).parent().parent().find("input[name=@name]").val($(this).attr("data-v"));
+                $@(id).find("ul").hide();
+            });
+        })
+    </script>
+}

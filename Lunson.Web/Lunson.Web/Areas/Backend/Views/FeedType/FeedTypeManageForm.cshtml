@@ -1,0 +1,65 @@
+﻿@model Lunson.Domain.Entities.FeedType
+@{
+    ViewBag.Title = "文章类型编辑";
+    var activeStates = EnumHelper.GetList(typeof(ActiveState));
+    activeStates.ForEach(a => { if (a.Value == ((int)Model.ActiveState + ""))a.IsSelected = true; });
+}
+
+<div class="default-form">
+    <h1>基本信息</h1>
+    <div class="content">
+        @using (Html.BeginForm())
+        {
+            @Form.Item("类型名称", "text", "Name", "*", Model.Name)
+            @Form.Item("类型代码", "text", "Code", "*", Model.Code)
+            @Form.Item("简单描述", "textarea", "Description", "", Model.Description)
+            <div style="display:none">
+            @Form.Radio("状态", activeStates, "ActiveState", "")
+            </div>
+            @Form.Select("顶部Flash", new Lunson.BLL.Services.FeedTypeService().GetFlashList(Model==null?"":Model.SwfID), "SwfID", "")
+    
+            <input type="hidden" name="ID" value="@(Model.ID==null?"":Model.ID)" />
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $(".msg").each(function () {
+            $(this).data("msg", $(this).text());
+        });
+
+        $(".default-form form").submit(function () {
+            $(".msg").each(function () {
+                $(this).text($(this).data("msg"));
+            });
+
+            $.ajax({
+                url: '@Url.Action("SaveData")',
+                data: pharos.json.formtojson($(this)),
+                dataType: 'json',
+                type: 'post',
+                async: false,
+                success: function (data, status) {
+                    if (data.validate) {
+                        pharos.easyui.alert('提示', '保存成功');
+                        pharos.easyui.dialog.topClose("formDiv");
+                        pharos.easyui.dialog.curJquery("formDiv")("#dg").datagrid("reload");
+                    }
+                    else {
+                        if (data.target == "") {
+                            pharos.easyui.alert('系统异常', data.msg);
+                        }
+                        else {
+                            $("input[name=" + data.target + "]").parent().find(".msg").text(data.msg);
+                        }
+                    }
+                },
+                error: function (e) { pharos.easyui.alert(e.status, e.statusText); }
+            });
+            return false;
+        });
+
+    })
+
+</script>

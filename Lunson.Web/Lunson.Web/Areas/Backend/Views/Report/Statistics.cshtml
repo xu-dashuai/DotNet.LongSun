@@ -1,0 +1,81 @@
+﻿@{
+    ViewBag.Title = "交易完成统计报表";
+}
+
+<style>
+    div.datagrid-footer tr {
+        background-color: #6293BB;
+        color: #fff;
+        font-weight: bold;
+    }
+</style>
+
+<script type="text/javascript">
+    window.drpdata = window.drpdata || {};
+    window.drpdata['ticketType'] = [];
+    @foreach (var item in new Lunson.BLL.Services.ReportService().GetAllTicket())
+    {
+        @:window.drpdata['ticketType'].push({ value: '@item.Value', text: '@item.Text', selected: true });
+                                    }
+</script>
+
+<div id="toolbar">
+    <select class="easyui-combobox" name="ticketType" id="ticketType" style="width:160px;height:50px"></select>
+    检票日期 <input class="Wdate" type="text" style="border-radius: 5px 5px 5px 5px; border: 1px solid #c3d9e0;" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" id="fromTime" name="fromTime" />
+    到 <input class="Wdate" type="text" style="border-radius: 5px 5px 5px 5px; border: 1px solid #c3d9e0;" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" id="endTime" name="endTime" />
+    <a id="search" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>
+    <a id="export" class="easyui-linkbutton" data-options="iconCls:'icon-save'" href="javascript:void(0);">导出xls</a>
+</div>
+
+<table id="dg"></table>
+
+<script type="text/javascript">
+    $(function () {
+        $("#ticketType").combobox({
+            data: window.drpdata['ticketType'],
+            valueField: 'value',
+            textField: 'text',
+            multiple: true,
+            multiline: true,
+            editable: false,
+            panelHeight: 'auto'
+        });
+    })
+
+    $("#dg").datagrid({
+        url: '@Url.Action("StatisticsData")',
+        toolbar: '#toolbar',
+        title: '<span style="color:#ff6a00;">该报表统计 所有卖出并且已被使用过的门票统计信息,以每类票种为单位</span>',
+        //fit: true,
+        border: false,
+        rownumbers: true,
+        singleSelect: true,
+        fitColumns: true,
+        showFooter: true,
+        columns: [[
+            { title: '门票名称', field: 'Name', width: 100, align: 'center' },
+            { title: '数量', field: 'Num', width: 60, align: 'center' },
+            { title: '售价/元', field: 'SalePrice', width: 60, align: 'center' },
+            { title: '总收入/元', field: 'Income', width: 60, align: 'center' },
+            { title: '备注', field: 'Resume', width: 100, align: 'center' }
+        ]],
+    })
+
+    $("#search").click(function () {
+        var fromTime = $("#fromTime").val() == "" ? "" : $("#fromTime").val() + " 00:00:00";
+        var endTime = $("#endTime").val() == "" ? "" : $("#endTime").val() + " 23:59:59";
+        var ids = $("#ticketType").combobox('getValues');
+
+        $("#dg").datagrid({
+            url: '@Url.Action("StatisticsData")',
+            queryParams: { ids: ids, fromTime: fromTime, endTime: endTime }
+        })
+    })
+    $("#export").click(function () {
+        var fromTime = $("#fromTime").val() == "" ? "" : $("#fromTime").val() + " 00:00:00";
+        var endTime = $("#endTime").val() == "" ? "" : $("#endTime").val() + " 23:59:59";
+        var ids = $("#ticketType").combobox('getValues');
+
+        window.open("@Url.Action("ExportStatisticsData")" + "?fromTime=" + fromTime + "&endTime=" + endTime + "&ids=" + ids);
+    })
+</script>

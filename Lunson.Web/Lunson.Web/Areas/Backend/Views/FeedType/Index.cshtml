@@ -1,0 +1,82 @@
+﻿@{
+    ViewBag.Title = "文章类型";
+}
+
+<table id="dg"></table>
+
+<div id="toolbar">
+    <a class="easyui-linkbutton" data-options="iconCls: 'icon-add'" onclick="openFormDlg()">添加类型</a>
+</div>
+
+<script type="text/javascript">
+    $dg = $("#dg");
+    var statustate = [];
+    @foreach (var x in EnumHelper.GetList<ActiveState>())
+    {
+        @:statustate.push({ value: '@x.Value', text: '@x.Text' });
+    }
+
+    $(function () {
+        $dg.datagrid({
+            rownumbers: true,
+            fit: true,
+            border: false,
+            singleSelect: true,
+            url: "@Url.Action("GetFeedTypes")",
+            toolbar: '#toolbar',
+            columns: [[
+                { field: 'Name', title: '类型名称', width: 200 },
+                { field: 'Code', title: '类型代码', width: 150 },
+                { field: 'SwfName', title: '附件SWF名称', width: 170 },
+                { field: 'Description', title: '描述', width: 300 },
+                //{ field: 'ActiveState', title: '状态', width: 50, align: 'center', formatter: function (value, row, index) { return pharos.json.getArrayValue(statustate, 'value', value, 'text', value); } },
+                { field: 'Editor', title: '操作', width: 80, align: 'center', formatter: opFormat}
+            ]]
+        })
+    })
+
+    function opFormat(value, row) {
+        var html = "";
+        html += "<a href=\"javascript:void(0)\" onclick=\"openFormDlg('" + row.ID + "')\">编辑</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+        html += "<a href=\"javascript:void(0)\" onclick=\"deleteData('" + row.ID + "')\">删除</a>";
+        return html;
+    }
+
+    function openFormDlg(id) {
+        var popID = "formDiv";
+        var formTitle;
+        if (!id) { formTitle = "添加文章类型"; id = null }
+        else { formTitle = "编辑文章类型" }
+
+        pharos.easyui.dialog.topOpen(popID, {
+            width: 700,
+            height: 600,
+            modal: true,
+            title: formTitle,
+            href: '@Url.Action("FeedTypeManageForm")?id=' + id,
+            buttons: [{
+                text: '保存',
+                iconCls: 'icon-save',
+                handler: function () { window.top.$('#formDiv form').submit(); }
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () { pharos.easyui.dialog.topClose(popID) }
+            }]
+        })
+    }
+
+    function deleteData(id) {
+        $.messager.defaults = { ok: "确定", cancel: "取消" };
+        $.messager.confirm('确认', '您确定要删除此记录吗？', function (r) {
+            if (r) {
+                $.ajax({
+                    url: '@Url.Action("DeleteData")' + '?id=' + id,
+                    success: function () {
+                        $("#dg").datagrid("reload");
+                    }
+                })
+            }
+        });
+    }
+</script>

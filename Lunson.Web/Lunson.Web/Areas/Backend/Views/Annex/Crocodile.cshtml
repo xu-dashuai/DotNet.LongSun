@@ -1,0 +1,57 @@
+﻿
+<table id="annex"></table>
+
+<div id="toolbar">
+    <a class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="create()">添加图片</a>
+</div>
+
+<script type="text/javascript">
+    $annex = $("#annex");
+    $(function () {
+        $annex.datagrid({
+            url: '@Url.Action("GetCrocodiles")',
+            fit: true,
+            border: false,
+            singleSelect: true,
+            toolbar: '#toolbar',
+            rownumbers: true,
+            columns: [[
+                {
+                    field: 'Image', title: '图片', width: 310, formatter: function (value, row, index) {
+                        if (row.Url) {
+                            return "<img src=\"" + row.Url + "_thumb.jpg\" height='225'>";
+                        }
+                        return "";
+                    }
+                },
+                { field: 'Url', title: '地址', width: 400 },
+                { field: 'Size', title: '大小(KB)', width: 60, formatter: function (value, row, index) { return (Number(value) / 1024).toFixed(2); } },
+                {
+                    field: 'Editor', title: '编辑', width: 100, formatter: function (value, row, index) {
+                        var html = "<a href='javascript:;' onclick=\"removecrocodile('" + row.ID + "')\">删除</a>";
+                        return html;
+                    }
+                }
+            ]]
+        });
+    })
+
+    function create() {
+        pharos.easyui.dialog.topOpen("createCrocodile", {
+            width: 350,
+            height: 180,
+            resizable: false,
+            modal: true,
+            title: '添加图片',
+            href: '@Url.Action("UploadCrocodile")'
+        });
+    }
+
+    function removecrocodile(id) {
+        pharos.easyui.confirm("确认", "确认删除么？", function () {
+            $.post("@Url.Action("RemoveCrocodile")/" + id, function () {
+                $("#annex").datagrid("reload");
+            })
+        });
+    }
+</script>

@@ -1,0 +1,13 @@
+﻿
+<div style="margin-top: 10px; margin-bottom: 10px; font-size: 1.1em; color: #725c37;">友情链接</div>
+<ul class="links">
+    @foreach (var x in new Lunson.BLL.Services.LinkService().GetLinks().Where(a=>a.ActiveState==Lunson.Domain.ActiveState.Normal&&a.Annex!=null))
+    { 
+    <li>
+        <a href="@x.LinkUrl" target="_blank" title="@x.Title">
+            <img src="@x.Annex.Url" width="121" height="35"/>
+        </a>
+    </li>
+    }
+</ul>
+

@@ -1,0 +1,86 @@
+﻿@model Lunson.Domain.Entities.Feed
+@{
+    //var activeStates = EnumHelper.GetList(typeof(ActiveState));
+    //activeStates.ForEach(a => { if (a.Value == ((int)Model.ActiveState + ""))a.IsSelected = true; });
+
+    Layout = "~/Areas/Backend/Views/Shared/_LayoutForm.cshtml";
+}
+
+<div class="default-form">
+    @using (Html.BeginForm("FeedManageForm", "Feed", FormMethod.Post, new { id = "feedManageForm" }))
+    {
+        <input type="hidden" name="ID" value="@Model.ID" />
+        <h1>基本信息</h1>
+        <div class="content">
+            @Form.Item("标题", "text", "Title", "*", Model.Title)
+            @Form.Item("作者", "text", "Author", "", Model.Author)
+            @Form.Item("文章来源", "text", "Original", "", Model.Original)
+            @*@Form.Item("排序", "number", "ShowOrder", "", Model.ShowOrder)*@
+            @*@Form.Select("状态", activeStates, "ActiveState", "*")*@
+            @Form.Select("类型", new Lunson.BLL.Services.FeedTypeService().FeedTypesItem(false), "FeedTypeID", "")
+            <div class="clearfix">
+                <label>发布时间</label>
+                <div>
+                    <input type="text" class="Wdate" name="PublishOn" id="PublishOn" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" style="width:200px;border:1px solid #d9d9d9;height:16px;line-height:16px;padding:6px 10px;border-radius:5px"/>
+                    <span class="msg"></span>
+                </div>
+            </div>
+        </div>
+        <h1>内容</h1>
+        <textarea id="Content" placeholder="" autofocus style="height:450px; width:100%">@Model.Content</textarea>
+    }
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        window.top.$("body").data('feedForm', $);
+
+        $("#PublishOn").val('@(Model.PublishOn == null ? Convert.ToDateTime(DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss") : Model.PublishOn.ToString("yyyy-MM-dd HH:mm:ss"))');
+
+        $("input[name='FeedTypeID']").val('@Model.FeedTypeID');
+        var selectText = $(".select").find("a[data-v='@Model.FeedTypeID']").text();
+        $(".select").find("span").text(selectText);
+
+        $('#Content').xheditor({ html5Upload: false, upLinkUrl: "Upload1", upLinkExt: "zip,rar,txt", upImgUrl: "Upload1", upImgExt: "jpg,jpeg,gif,png", upFlashUrl: "Upload1", upFlashExt: "swf", upMediaUrl: "Upload1", upMediaExt: "wmv,avi,wma,asf,mp3" });
+
+        $(".msg").each(function () {
+            $(this).data("msg", $(this).text());
+        });
+
+        $(".default-form form").submit(function () {
+            $(".msg").each(function () {
+                $(this).text($(this).data("msg"));
+            });
+
+            var json = pharos.json.formtojson($(this));
+            pharos.json.edit(json, "Content", $("#Content").val());
+
+            $.ajax({
+                url: '@Url.Action("SaveData")',
+                data: json,
+                dataType: 'json',
+                type: 'post',
+                async: false,
+                success: function (data, status) {
+                    if (data.validate) {
+                        pharos.easyui.alert('提示', '保存成功');
+                        pharos.easyui.dialog.curJquery("feed")("#dg").datagrid("reload");
+                        pharos.easyui.dialog.topClose("feed");
+                    }
+                    else {
+                        if (data.target == "") {
+                            pharos.easyui.alert('系统异常', data.msg);
+                        }
+                        else {
+                            $("input[name=" + data.target + "]").parent().find(".msg").text(data.msg);
+                        }
+                    }
+                },
+                error: function (e) { pharos.easyui.alert(e.status, e.statusText); }
+            });
+            return false;
+        });
+
+    })
+
+</script>

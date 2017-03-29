@@ -1,0 +1,39 @@
+﻿@model Lunson.Web.Models.CustomerLoginVM
+@{
+    ViewBag.Title = "前台登录";
+}
+
+@using (Html.BeginForm())
+{
+    <div class="loginwrap">
+        <h1>用户登录</h1>
+        <p class="msg"><label>手机号</label><input type="text" id="Mobile" name="Mobile" value="@Html.ValueFor(model => model.Mobile)" />
+           @Html.ValidationMessageFor(model => model.Mobile)
+         </p>
+        <p class="msg">
+            <label>密码</label><input type="password" id="Password" name="Password" value="@Html.ValueFor(model => model.Password)"/>
+            @Html.ValidationMessageFor(model => model.Password)
+        </p>
+        <p class="clearfix">
+            <span style="float:left;">
+                <input type="checkbox" class="remenber" id="IsRememberMe" name="IsRememberMe" value="true" style=" vertical-align:middle;"/>
+                下次自动登录
+            </span>
+            <a href="@Url.Action("Forget")" style="float: right; color: #908f90;">忘记密码？</a>
+        </p>
+        <p class="btn">
+            <a class="btn-login" onclick="login(); return false;">登录</a>
+        </p>
+        <p>还没有帐号？</p>
+        <p>
+            <a class="btn-register" href="@Url.Action("Register")">现在注册</a>
+        </p>
+    </div>
+}
+
+
+<script type="text/javascript">
+    function login() {
+        $("form").submit();
+    }
+</script>

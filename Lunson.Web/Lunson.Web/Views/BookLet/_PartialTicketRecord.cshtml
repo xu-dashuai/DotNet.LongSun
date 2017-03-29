@@ -1,0 +1,132 @@
+﻿@using Lunson.Domain.Entities
+@using Pharos.Framework
+@{
+    int page = Request.Params["page"] == null ? 1 : int.Parse(Request.Params["page"]);
+    var list = new Lunson.BLL.Services.TicketService().CustomerTicketRecords(new Lunson.Web.CustomerCache().CustomerID);
+    var listpage = list.Count() > 0 ? list.ToPagedList(page, 5) as Pharos.Framework.PagedList<Lunson.Domain.Entities.TicketDetail> : null;
+}
+
+<style type="text/css">
+    .ticketrecord li {
+        position: relative;
+        height: 100px;
+        line-height: 100px;
+        margin-bottom: 10px;
+    }
+
+        .ticketrecord li .select {
+            width: 30px;
+            float: left;
+            height: 100px;
+            text-align: center;
+            line-height: 100px;
+            margin-right: 10px;
+        }
+
+            .ticketrecord li .select input {
+                *margin-top: 45px;
+            }
+
+        .ticketrecord li .item {
+            height: 100px;
+            position: relative;
+            width: 978px;
+            float: left;
+            border: solid 1px #e4e8ee;
+        }
+
+            .ticketrecord li .item img {
+                height: 100px;
+                width: 200px;
+                float: left;
+            }
+
+        .ticketrecord li .detail {
+            width: 300px;
+            margin-left: 50px;
+            height: 100px;
+            float: left;
+        }
+
+            .ticketrecord li .detail .name {
+                font-size: 1.5em;
+                color: #b9cd4b;
+                line-height: 50px;
+            }
+
+            .ticketrecord li .detail .price {
+                line-height: 50px;
+                font-size: 1.5em;
+                color: #ff7700;
+            }
+
+        .ticketrecord li .item .time {
+            width: 180px;
+            float: right;
+        }
+
+            .ticketrecord li .item .time p {
+                line-height: 30px;
+            }
+
+                .ticketrecord li .item .time p.status {
+                    color: #ff7700;
+                    font-size: 1.5em;
+                    margin-top: 20px;
+                }
+
+                .ticketrecord li .item .time p.buytime {
+                    color: gray;
+                    line-height: normal;
+                }
+</style>
+
+<div class="">
+    <div class="wrap">
+        <ul class="ticketrecord">
+            @if (listpage != null)
+            {
+                foreach (var item in listpage)
+                {
+                    <li class="clearfix">
+                        <div class="item">
+                            <img src="@(item.Annex.Url)_thumb.jpg" />
+                            <div class="detail">
+                                <p class="name">@item.Name</p>
+                                <p class="price">￥@item.CurPrice</p>
+                            </div>
+                            <div class="time">
+                                <p class="status">@(Pharos.Framework.EnumHelper.GetDescription(item.Status))</p>
+                                @switch (item.Status)
+                                {
+                                    case Lunson.Domain.TicketStatus.Refunding:
+                                        <p class="buytime">申请时间：@Convert.ToDateTime(item.RefundingTime).ToString("yyyy-MM-dd HH:mm:ss")</p>
+                                        break;
+                                    case Lunson.Domain.TicketStatus.Refunded:
+                                    <p class="buytime">申请时间：@Convert.ToDateTime(item.RefundingTime).ToString("yyyy-MM-dd HH:mm:ss")</p>
+                                    <p class="buytime">确认时间：@Convert.ToDateTime(item.RefundedTime).ToString("yyyy-MM-dd HH:mm:ss")</p>
+                                        break;
+                                    case Lunson.Domain.TicketStatus.IsUsed:
+                                    <p class="buytime">购买时间：@Convert.ToDateTime(item.BuyTime).ToString("yyyy-MM-dd HH:mm:ss")</p>
+                                    <p class="buytime">使用时间：@Convert.ToDateTime(item.UsedTime).ToString("yyyy-MM-dd HH:mm:ss")</p>
+                                        break;
+                                    case Lunson.Domain.TicketStatus.Invalid:
+                                    <p class="buytime">购买时间：@Convert.ToDateTime(item.BuyTime).ToString("yyyy-MM-dd HH:mm:ss")</p>
+                                    <p class="buytime">作废时间：@Convert.ToDateTime(item.ModifiedOn).ToString("yyyy-MM-dd HH:mm:ss")</p>
+                                        break;
+                                    default:
+                                    <p class="buytime">购买时间：@Convert.ToDateTime(item.BuyTime).ToString("yyyy-MM-dd HH:mm:ss")</p>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                    </li>
+                }
+            }
+        </ul>
+        @if (listpage != null)
+        {
+            @Html.Raw(Html.Pager(listpage))
+        }
+    </div>
+</div>

@@ -1,0 +1,13 @@
+﻿@model string
+
+<div class="numbox clearfix">
+    @if(ViewBag.label==null)
+    { 
+    <label>数量</label>
+    }
+    <div>
+        <a href="javascript:;" class="decrease"></a>
+        <input type="text" name="num" class="num" data-target="@Model" value="@(ViewBag.num==null?0:ViewBag.num)" maxlength="3" min="1"/>
+        <a href="javascript:;" class="increase"></a>
+    </div>
+</div>
